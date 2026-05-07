@@ -1,0 +1,218 @@
+================================================================================
+CRISIS BEHAVIORAL ANALYSIS - SUMMARY REPORT
+LA WILDFIRES - JANUARY 2025
+================================================================================
+
+DATA OVERVIEW:
+--------------------------------------------------------------------------------
+Analysis Period: 2025-01-03 to 2025-02-05
+Total Days Analyzed: 33
+Binary Features: 19
+
+FEATURE ACTIVATION SUMMARY:
+--------------------------------------------------------------------------------
+  anger_mentioned                                21.2%
+  anxiety_keywords_present                        6.1%
+  dominant_emotion_fear                          15.2%
+  emotion_mobility_mismatch                      27.3%
+  emotion_with_mobility_signal                   27.3%
+  evacuation_mentioned                            9.1%
+  fear_keywords_present                          39.4%
+  high_negative_sentiment                        33.3%
+  high_positive_sentiment                         6.1%
+  low_emotion_low_mobility_signal                27.3%
+  mixed_emotions                                 15.2%
+  policy_governance_discussion                   48.5%
+  sadness_keywords_present                       33.3%
+  sentiment_improved                             18.2%
+  sentiment_shift_detected                       39.4%
+  sentiment_worsened                             21.2%
+  solidarity_messages                            54.5%
+  traffic_congestion_detected                    42.4%
+  weekend                                        27.3%
+
+
+TOP 20 LLM-SELECTED ASSOCIATION RULES:
+--------------------------------------------------------------------------------
+
+Rule 1: [CROSS-DOMAIN]
+  IF:   traffic_congestion_detected, anger_mentioned
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)
+  Confidence: 100.0%
+  Lift: 2.54
+  LLM: novelty=8/10  policy_relevance=7/10
+  Why it matters: The finding that traffic congestion can lead to increased fear keywords is surprising, as one might expect fear to lead to congestion due to evacuations.
+  Policy recommendation: Emergency managers should monitor traffic congestion closely as a potential indicator of rising fear levels, prompting timely communication and support.
+
+Rule 2: [CROSS-DOMAIN]
+  IF:   traffic_congestion_detected, sadness_keywords_present
+  THEN: policy_governance_discussion
+  Support: 6 days (18.2%)
+  Confidence: 83.3%
+  Lift: 1.72
+  LLM: novelty=7/10  policy_relevance=8/10
+  Why it matters: The association between traffic congestion and discussions on policy governance suggests that logistical issues may prompt community governance discussions, which is unexpected.
+  Policy recommendation: Encourage local governance bodies to proactively engage with communities during high congestion periods to address concerns and provide clear guidance.
+
+Rule 3: [CROSS-DOMAIN]
+  IF:   traffic_congestion_detected, anger_mentioned
+  THEN: policy_governance_discussion
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 1.65
+  LLM: novelty=7/10  policy_relevance=8/10
+  Why it matters: Traffic congestion leading to policy governance discussions indicates that logistical challenges can drive community engagement in governance, which is not commonly recognized.
+  Policy recommendation: Facilitate platforms for community discussions during crises to address policy concerns arising from mobility issues.
+
+Rule 4: [CROSS-DOMAIN]
+  IF:   fear_keywords_present, anger_mentioned
+  THEN: traffic_congestion_detected
+  Support: 6 days (18.2%)
+  Confidence: 83.3%
+  Lift: 1.96
+  LLM: novelty=6/10  policy_relevance=7/10
+  Why it matters: Fear and anger leading to traffic congestion suggests a complex emotional response influencing physical behavior, which is not a typical assumption.
+  Policy recommendation: Implement emotional support services during crises to mitigate fear and anger, potentially reducing congestion.
+
+Rule 5: [CROSS-DOMAIN]
+  IF:   anger_mentioned, policy_governance_discussion
+  THEN: traffic_congestion_detected
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 1.89
+  LLM: novelty=6/10  policy_relevance=7/10
+  Why it matters: The link between policy governance discussions and traffic congestion indicates that community concerns can manifest in physical mobility patterns, which is unexpected.
+  Policy recommendation: Enhance communication strategies to address community concerns about policy during high congestion periods.
+
+Rule 6: [CROSS-DOMAIN]
+  IF:   traffic_congestion_detected, emotion_with_mobility_signal
+  THEN: fear_keywords_present
+  Support: 9 days (27.3%)
+  Confidence: 88.9%
+  Lift: 2.26
+  LLM: novelty=6/10  policy_relevance=6/10
+  Why it matters: The connection between traffic congestion and fear keywords through an emotional mobility signal highlights an unexpected emotional response to physical conditions.
+  Policy recommendation: Monitor emotional signals in conjunction with mobility data to better understand community sentiment and respond effectively.
+
+Rule 7:
+  IF:   fear_keywords_present, mixed_emotions
+  THEN: sadness_keywords_present
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 3.00
+  LLM: novelty=5/10  policy_relevance=6/10
+  Why it matters: The finding that mixed emotions and fear keywords can lead to sadness keywords suggests a complex emotional landscape that influences community sentiment.
+  Policy recommendation: Develop targeted mental health resources that address mixed emotions during crises to support community resilience.
+
+Rule 8:
+  IF:   anger_mentioned, sadness_keywords_present
+  THEN: mixed_emotions
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 6.60
+  LLM: novelty=5/10  policy_relevance=5/10
+  Why it matters: Anger and sadness leading to mixed emotions indicates that emotional responses can complicate community dynamics in crises, which is not commonly acknowledged.
+  Policy recommendation: Provide emotional support resources to help individuals navigate complex feelings during crises, potentially improving community cohesion.
+
+Rule 9:
+  IF:   high_negative_sentiment, sentiment_shift_detected
+  THEN: sentiment_worsened
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 3.77
+  LLM: novelty=5/10  policy_relevance=5/10
+  Why it matters: High negative sentiment leading to sentiment worsening through a shift detected suggests a feedback loop that could escalate community distress.
+  Policy recommendation: Implement real-time sentiment analysis to identify and address negative trends before they escalate into broader community issues.
+
+Rule 10:
+  IF:   sentiment_shift_detected, fear_keywords_present
+  THEN: sentiment_worsened
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 3.77
+  LLM: novelty=5/10  policy_relevance=5/10
+  Why it matters: The relationship between sentiment shift and fear keywords indicates that emotional responses can significantly impact community sentiment, which is often overlooked.
+  Policy recommendation: Utilize sentiment analysis to inform communication strategies, ensuring messages resonate with community emotions during crises.
+
+Rule 11:
+  IF:   sadness_keywords_present, mixed_emotions
+  THEN: anger_mentioned
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 3.77
+  LLM: novelty=4/10  policy_relevance=5/10
+  Why it matters: Sadness and mixed emotions leading to anger suggests that emotional responses can escalate, which is a surprising insight into community dynamics.
+  Policy recommendation: Create community engagement initiatives that address sadness and promote positive emotional expression to prevent escalation.
+
+Rule 12:
+  IF:   sentiment_shift_detected, emotion_mobility_mismatch
+  THEN: high_negative_sentiment
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 3.00
+  LLM: novelty=4/10  policy_relevance=5/10
+  Why it matters: Sentiment shift detected leading to high negative sentiment indicates a potential for emotional crises that could affect community stability.
+  Policy recommendation: Establish early warning systems based on sentiment analysis to proactively address emerging emotional crises.
+
+Rule 13:
+  IF:   high_negative_sentiment, weekend
+  THEN: emotion_mobility_mismatch
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 3.67
+  LLM: novelty=4/10  policy_relevance=4/10
+  Why it matters: High negative sentiment on weekends leading to emotion mobility mismatch suggests that emotional responses can vary significantly by day, which is unexpected.
+  Policy recommendation: Tailor community support services to address emotional needs specifically during weekends when sentiment may shift.
+
+Rule 14:
+  IF:   weekend, emotion_mobility_mismatch
+  THEN: high_negative_sentiment
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 2.40
+  LLM: novelty=4/10  policy_relevance=4/10
+  Why it matters: Weekend emotion mobility mismatch leading to high negative sentiment indicates that emotional responses can vary significantly by day, which is unexpected.
+  Policy recommendation: Monitor emotional trends over weekends to better allocate resources for community support during these times.
+
+Rule 15:
+  IF:   anger_mentioned, solidarity_messages
+  THEN: sadness_keywords_present
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 2.40
+  LLM: novelty=4/10  policy_relevance=4/10
+  Why it matters: The connection between anger and solidarity messages leading to sadness suggests that community dynamics can shift unexpectedly during crises.
+  Policy recommendation: Encourage solidarity initiatives that foster community support, especially when anger is prevalent, to mitigate sadness.
+
+Rule 16:
+  IF:   anger_mentioned, sadness_keywords_present
+  THEN: solidarity_messages
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 1.83
+  LLM: novelty=4/10  policy_relevance=4/10
+  Why it matters: Anger and sadness leading to solidarity messages indicates that emotional responses can drive community cohesion in unexpected ways.
+  Policy recommendation: Promote community solidarity initiatives during times of heightened anger to foster resilience and support.
+
+Rule 17:
+  IF:   anger_mentioned, mixed_emotions
+  THEN: solidarity_messages
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 1.83
+  LLM: novelty=4/10  policy_relevance=4/10
+  Why it matters: Anger and mixed emotions leading to solidarity messages suggests that emotional complexity can drive community engagement, which is not commonly recognized.
+  Policy recommendation: Leverage mixed emotions to create community engagement strategies that promote solidarity and support.
+
+Rule 18:
+  IF:   policy_governance_discussion, low_emotion_low_mobility_signal
+  THEN: solidarity_messages
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 1.83
+  LLM: novelty=4/10  policy_relevance=4/10
+  Why it matters: Low emotion and low mobility signals leading to solidarity messages indicates that even in low engagement scenarios, community support can emerge unexpectedly.
+  Policy recommendation: Encourage community outreach programs that foster solidarity even in low engagement periods to maintain connections.
+
+================================================================================

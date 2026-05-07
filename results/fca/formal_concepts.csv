@@ -1,0 +1,143 @@
+extent,intent,support
+(),"('traffic_congestion_detected', 'high_negative_sentiment', 'high_positive_sentiment', 'sentiment_shift_detected', 'sentiment_improved', 'sentiment_worsened', 'fear_keywords_present', 'anger_mentioned', 'sadness_keywords_present', 'anxiety_keywords_present', 'dominant_emotion_fear', 'mixed_emotions', 'evacuation_mentioned', 'policy_governance_discussion', 'solidarity_messages', 'weekend', 'emotion_mobility_mismatch', 'low_emotion_low_mobility_signal', 'emotion_with_mobility_signal')",0
+"('Day_4',)","('traffic_congestion_detected', 'sentiment_shift_detected', 'sentiment_improved', 'fear_keywords_present', 'sadness_keywords_present', 'anxiety_keywords_present', 'dominant_emotion_fear', 'mixed_emotions', 'emotion_with_mobility_signal')",1
+"('Day_5',)","('fear_keywords_present', 'anger_mentioned', 'sadness_keywords_present', 'mixed_emotions', 'solidarity_messages', 'emotion_mobility_mismatch')",1
+"('Day_6',)","('sadness_keywords_present', 'evacuation_mentioned', 'solidarity_messages', 'low_emotion_low_mobility_signal')",1
+"('Day_7',)","('high_negative_sentiment', 'sentiment_shift_detected', 'sentiment_worsened', 'weekend', 'emotion_mobility_mismatch')",1
+"('Day_8',)","('high_positive_sentiment', 'sentiment_shift_detected', 'sentiment_improved', 'solidarity_messages', 'weekend', 'low_emotion_low_mobility_signal')",1
+"('Day_9',)","('sentiment_shift_detected', 'sentiment_worsened', 'anger_mentioned', 'sadness_keywords_present', 'anxiety_keywords_present', 'mixed_emotions', 'policy_governance_discussion', 'solidarity_messages', 'low_emotion_low_mobility_signal')",1
+"('Day_14',)","('fear_keywords_present', 'policy_governance_discussion', 'solidarity_messages', 'weekend', 'emotion_mobility_mismatch')",1
+"('Day_15',)","('policy_governance_discussion', 'solidarity_messages', 'weekend', 'low_emotion_low_mobility_signal')",1
+"('Day_16',)","('high_negative_sentiment', 'sentiment_shift_detected', 'sentiment_worsened', 'fear_keywords_present', 'dominant_emotion_fear', 'solidarity_messages', 'emotion_mobility_mismatch')",1
+"('Day_18',)","('traffic_congestion_detected', 'sentiment_shift_detected', 'sentiment_worsened', 'fear_keywords_present', 'anger_mentioned', 'sadness_keywords_present', 'mixed_emotions', 'evacuation_mentioned', 'policy_governance_discussion', 'solidarity_messages', 'emotion_with_mobility_signal')",1
+"('Day_19',)","('traffic_congestion_detected', 'fear_keywords_present', 'sadness_keywords_present', 'dominant_emotion_fear', 'policy_governance_discussion', 'emotion_with_mobility_signal')",1
+"('Day_20',)","('traffic_congestion_detected', 'high_negative_sentiment', 'sentiment_shift_detected', 'sentiment_worsened', 'fear_keywords_present', 'anger_mentioned', 'policy_governance_discussion', 'emotion_with_mobility_signal')",1
+"('Day_21',)","('high_negative_sentiment', 'fear_keywords_present', 'sadness_keywords_present', 'dominant_emotion_fear', 'policy_governance_discussion', 'weekend', 'emotion_mobility_mismatch')",1
+"('Day_22',)","('high_negative_sentiment', 'sentiment_shift_detected', 'sentiment_improved', 'policy_governance_discussion', 'weekend', 'emotion_mobility_mismatch')",1
+"('Day_24',)","('traffic_congestion_detected', 'high_negative_sentiment', 'fear_keywords_present', 'solidarity_messages', 'emotion_with_mobility_signal')",1
+"('Day_26',)","('traffic_congestion_detected', 'sentiment_shift_detected', 'sentiment_improved', 'sadness_keywords_present', 'policy_governance_discussion', 'solidarity_messages')",1
+"('Day_31',)","('traffic_congestion_detected', 'high_positive_sentiment', 'sentiment_shift_detected', 'sentiment_improved')",1
+"('Day_3', 'Day_20')","('traffic_congestion_detected', 'high_negative_sentiment', 'fear_keywords_present', 'anger_mentioned', 'emotion_with_mobility_signal')",2
+"('Day_4', 'Day_9')","('sentiment_shift_detected', 'sadness_keywords_present', 'anxiety_keywords_present', 'mixed_emotions')",2
+"('Day_4', 'Day_18')","('traffic_congestion_detected', 'sentiment_shift_detected', 'fear_keywords_present', 'sadness_keywords_present', 'mixed_emotions', 'emotion_with_mobility_signal')",2
+"('Day_4', 'Day_19')","('traffic_congestion_detected', 'fear_keywords_present', 'sadness_keywords_present', 'dominant_emotion_fear', 'emotion_with_mobility_signal')",2
+"('Day_4', 'Day_26')","('traffic_congestion_detected', 'sentiment_shift_detected', 'sentiment_improved', 'sadness_keywords_present')",2
+"('Day_5', 'Day_21')","('fear_keywords_present', 'sadness_keywords_present', 'emotion_mobility_mismatch')",2
+"('Day_6', 'Day_9')","('sadness_keywords_present', 'solidarity_messages', 'low_emotion_low_mobility_signal')",2
+"('Day_7', 'Day_22')","('high_negative_sentiment', 'sentiment_shift_detected', 'weekend', 'emotion_mobility_mismatch')",2
+"('Day_8', 'Day_9')","('sentiment_shift_detected', 'solidarity_messages', 'low_emotion_low_mobility_signal')",2
+"('Day_8', 'Day_22')","('sentiment_shift_detected', 'sentiment_improved', 'weekend')",2
+"('Day_8', 'Day_31')","('high_positive_sentiment', 'sentiment_shift_detected', 'sentiment_improved')",2
+"('Day_9', 'Day_18')","('sentiment_shift_detected', 'sentiment_worsened', 'anger_mentioned', 'sadness_keywords_present', 'mixed_emotions', 'policy_governance_discussion', 'solidarity_messages')",2
+"('Day_13', 'Day_18')","('traffic_congestion_detected', 'fear_keywords_present', 'anger_mentioned', 'sadness_keywords_present', 'mixed_emotions', 'evacuation_mentioned', 'policy_governance_discussion', 'solidarity_messages', 'emotion_with_mobility_signal')",2
+"('Day_14', 'Day_15')","('policy_governance_discussion', 'solidarity_messages', 'weekend')",2
+"('Day_14', 'Day_21')","('fear_keywords_present', 'policy_governance_discussion', 'weekend', 'emotion_mobility_mismatch')",2
+"('Day_16', 'Day_18')","('sentiment_shift_detected', 'sentiment_worsened', 'fear_keywords_present', 'solidarity_messages')",2
+"('Day_16', 'Day_24')","('high_negative_sentiment', 'fear_keywords_present', 'solidarity_messages')",2
+"('Day_16', 'Day_30')","('high_negative_sentiment', 'sentiment_shift_detected', 'sentiment_worsened', 'fear_keywords_present', 'dominant_emotion_fear', 'emotion_mobility_mismatch')",2
+"('Day_17', 'Day_26')","('traffic_congestion_detected', 'sentiment_shift_detected', 'sentiment_improved', 'policy_governance_discussion', 'solidarity_messages')",2
+"('Day_18', 'Day_20')","('traffic_congestion_detected', 'sentiment_shift_detected', 'sentiment_worsened', 'fear_keywords_present', 'anger_mentioned', 'policy_governance_discussion', 'emotion_with_mobility_signal')",2
+"('Day_18', 'Day_26')","('traffic_congestion_detected', 'sentiment_shift_detected', 'sadness_keywords_present', 'policy_governance_discussion', 'solidarity_messages')",2
+"('Day_18', 'Day_27')","('traffic_congestion_detected', 'sentiment_shift_detected', 'sentiment_worsened', 'solidarity_messages')",2
+"('Day_19', 'Day_21')","('fear_keywords_present', 'sadness_keywords_present', 'dominant_emotion_fear', 'policy_governance_discussion')",2
+"('Day_20', 'Day_21')","('high_negative_sentiment', 'fear_keywords_present', 'policy_governance_discussion')",2
+"('Day_20', 'Day_22')","('high_negative_sentiment', 'sentiment_shift_detected', 'policy_governance_discussion')",2
+"('Day_21', 'Day_28')","('high_negative_sentiment', 'sadness_keywords_present', 'policy_governance_discussion', 'weekend', 'emotion_mobility_mismatch')",2
+"('Day_3', 'Day_20', 'Day_24')","('traffic_congestion_detected', 'high_negative_sentiment', 'fear_keywords_present', 'emotion_with_mobility_signal')",3
+"('Day_4', 'Day_9', 'Day_18')","('sentiment_shift_detected', 'sadness_keywords_present', 'mixed_emotions')",3
+"('Day_4', 'Day_13', 'Day_18')","('traffic_congestion_detected', 'fear_keywords_present', 'sadness_keywords_present', 'mixed_emotions', 'emotion_with_mobility_signal')",3
+"('Day_4', 'Day_16', 'Day_30')","('sentiment_shift_detected', 'fear_keywords_present', 'dominant_emotion_fear')",3
+"('Day_4', 'Day_18', 'Day_20')","('traffic_congestion_detected', 'sentiment_shift_detected', 'fear_keywords_present', 'emotion_with_mobility_signal')",3
+"('Day_4', 'Day_18', 'Day_26')","('traffic_congestion_detected', 'sentiment_shift_detected', 'sadness_keywords_present')",3
+"('Day_4', 'Day_19', 'Day_21')","('fear_keywords_present', 'sadness_keywords_present', 'dominant_emotion_fear')",3
+"('Day_5', 'Day_13', 'Day_18')","('fear_keywords_present', 'anger_mentioned', 'sadness_keywords_present', 'mixed_emotions', 'solidarity_messages')",3
+"('Day_5', 'Day_14', 'Day_16')","('fear_keywords_present', 'solidarity_messages', 'emotion_mobility_mismatch')",3
+"('Day_5', 'Day_21', 'Day_28')","('sadness_keywords_present', 'emotion_mobility_mismatch')",3
+"('Day_6', 'Day_13', 'Day_18')","('sadness_keywords_present', 'evacuation_mentioned', 'solidarity_messages')",3
+"('Day_7', 'Day_8', 'Day_22')","('sentiment_shift_detected', 'weekend')",3
+"('Day_7', 'Day_16', 'Day_30')","('high_negative_sentiment', 'sentiment_shift_detected', 'sentiment_worsened', 'emotion_mobility_mismatch')",3
+"('Day_8', 'Day_15', 'Day_29')","('solidarity_messages', 'weekend', 'low_emotion_low_mobility_signal')",3
+"('Day_8', 'Day_17', 'Day_26')","('sentiment_shift_detected', 'sentiment_improved', 'solidarity_messages')",3
+"('Day_9', 'Day_13', 'Day_18')","('anger_mentioned', 'sadness_keywords_present', 'mixed_emotions', 'policy_governance_discussion', 'solidarity_messages')",3
+"('Day_9', 'Day_18', 'Day_20')","('sentiment_shift_detected', 'sentiment_worsened', 'anger_mentioned', 'policy_governance_discussion')",3
+"('Day_9', 'Day_18', 'Day_26')","('sentiment_shift_detected', 'sadness_keywords_present', 'policy_governance_discussion', 'solidarity_messages')",3
+"('Day_11', 'Day_13', 'Day_18')","('traffic_congestion_detected', 'fear_keywords_present', 'anger_mentioned', 'policy_governance_discussion', 'solidarity_messages', 'emotion_with_mobility_signal')",3
+"('Day_13', 'Day_18', 'Day_19')","('traffic_congestion_detected', 'fear_keywords_present', 'sadness_keywords_present', 'policy_governance_discussion', 'emotion_with_mobility_signal')",3
+"('Day_16', 'Day_20', 'Day_30')","('high_negative_sentiment', 'sentiment_shift_detected', 'sentiment_worsened', 'fear_keywords_present')",3
+"('Day_16', 'Day_21', 'Day_30')","('high_negative_sentiment', 'fear_keywords_present', 'dominant_emotion_fear', 'emotion_mobility_mismatch')",3
+"('Day_17', 'Day_18', 'Day_26')","('traffic_congestion_detected', 'sentiment_shift_detected', 'policy_governance_discussion', 'solidarity_messages')",3
+"('Day_17', 'Day_22', 'Day_26')","('sentiment_shift_detected', 'sentiment_improved', 'policy_governance_discussion')",3
+"('Day_18', 'Day_20', 'Day_27')","('traffic_congestion_detected', 'sentiment_shift_detected', 'sentiment_worsened')",3
+"('Day_21', 'Day_22', 'Day_28')","('high_negative_sentiment', 'policy_governance_discussion', 'weekend', 'emotion_mobility_mismatch')",3
+"('Day_1', 'Day_8', 'Day_15', 'Day_29')","('weekend', 'low_emotion_low_mobility_signal')",4
+"('Day_3', 'Day_20', 'Day_24', 'Day_25')","('traffic_congestion_detected', 'high_negative_sentiment', 'emotion_with_mobility_signal')",4
+"('Day_4', 'Day_5', 'Day_13', 'Day_18')","('fear_keywords_present', 'sadness_keywords_present', 'mixed_emotions')",4
+"('Day_4', 'Day_9', 'Day_18', 'Day_26')","('sentiment_shift_detected', 'sadness_keywords_present')",4
+"('Day_4', 'Day_13', 'Day_18', 'Day_19')","('traffic_congestion_detected', 'fear_keywords_present', 'sadness_keywords_present', 'emotion_with_mobility_signal')",4
+"('Day_4', 'Day_17', 'Day_26', 'Day_31')","('traffic_congestion_detected', 'sentiment_shift_detected', 'sentiment_improved')",4
+"('Day_5', 'Day_9', 'Day_13', 'Day_18')","('anger_mentioned', 'sadness_keywords_present', 'mixed_emotions', 'solidarity_messages')",4
+"('Day_5', 'Day_11', 'Day_13', 'Day_18')","('fear_keywords_present', 'anger_mentioned', 'solidarity_messages')",4
+"('Day_7', 'Day_16', 'Day_20', 'Day_30')","('high_negative_sentiment', 'sentiment_shift_detected', 'sentiment_worsened')",4
+"('Day_7', 'Day_16', 'Day_22', 'Day_30')","('high_negative_sentiment', 'sentiment_shift_detected', 'emotion_mobility_mismatch')",4
+"('Day_7', 'Day_21', 'Day_22', 'Day_28')","('high_negative_sentiment', 'weekend', 'emotion_mobility_mismatch')",4
+"('Day_8', 'Day_14', 'Day_15', 'Day_29')","('solidarity_messages', 'weekend')",4
+"('Day_9', 'Day_10', 'Day_15', 'Day_23')","('policy_governance_discussion', 'solidarity_messages', 'low_emotion_low_mobility_signal')",4
+"('Day_9', 'Day_11', 'Day_13', 'Day_18')","('anger_mentioned', 'policy_governance_discussion', 'solidarity_messages')",4
+"('Day_9', 'Day_16', 'Day_18', 'Day_27')","('sentiment_shift_detected', 'sentiment_worsened', 'solidarity_messages')",4
+"('Day_9', 'Day_17', 'Day_18', 'Day_26')","('sentiment_shift_detected', 'policy_governance_discussion', 'solidarity_messages')",4
+"('Day_11', 'Day_13', 'Day_14', 'Day_18')","('fear_keywords_present', 'policy_governance_discussion', 'solidarity_messages')",4
+"('Day_11', 'Day_13', 'Day_18', 'Day_20')","('traffic_congestion_detected', 'fear_keywords_present', 'anger_mentioned', 'policy_governance_discussion', 'emotion_with_mobility_signal')",4
+"('Day_11', 'Day_13', 'Day_18', 'Day_24')","('traffic_congestion_detected', 'fear_keywords_present', 'solidarity_messages', 'emotion_with_mobility_signal')",4
+"('Day_12', 'Day_13', 'Day_18', 'Day_26')","('traffic_congestion_detected', 'sadness_keywords_present', 'policy_governance_discussion', 'solidarity_messages')",4
+"('Day_13', 'Day_18', 'Day_19', 'Day_21')","('fear_keywords_present', 'sadness_keywords_present', 'policy_governance_discussion')",4
+"('Day_14', 'Day_21', 'Day_22', 'Day_28')","('policy_governance_discussion', 'weekend', 'emotion_mobility_mismatch')",4
+"('Day_16', 'Day_18', 'Day_20', 'Day_30')","('sentiment_shift_detected', 'sentiment_worsened', 'fear_keywords_present')",4
+"('Day_17', 'Day_18', 'Day_20', 'Day_26')","('traffic_congestion_detected', 'sentiment_shift_detected', 'policy_governance_discussion')",4
+"('Day_17', 'Day_18', 'Day_26', 'Day_27')","('traffic_congestion_detected', 'sentiment_shift_detected', 'solidarity_messages')",4
+"('Day_20', 'Day_21', 'Day_22', 'Day_28')","('high_negative_sentiment', 'policy_governance_discussion')",4
+"('Day_3', 'Day_11', 'Day_13', 'Day_18', 'Day_20')","('traffic_congestion_detected', 'fear_keywords_present', 'anger_mentioned', 'emotion_with_mobility_signal')",5
+"('Day_4', 'Day_5', 'Day_9', 'Day_13', 'Day_18')","('sadness_keywords_present', 'mixed_emotions')",5
+"('Day_4', 'Day_16', 'Day_18', 'Day_20', 'Day_30')","('sentiment_shift_detected', 'fear_keywords_present')",5
+"('Day_4', 'Day_16', 'Day_19', 'Day_21', 'Day_30')","('fear_keywords_present', 'dominant_emotion_fear')",5
+"('Day_5', 'Day_9', 'Day_11', 'Day_13', 'Day_18')","('anger_mentioned', 'solidarity_messages')",5
+"('Day_5', 'Day_14', 'Day_16', 'Day_21', 'Day_30')","('fear_keywords_present', 'emotion_mobility_mismatch')",5
+"('Day_7', 'Day_14', 'Day_21', 'Day_22', 'Day_28')","('weekend', 'emotion_mobility_mismatch')",5
+"('Day_7', 'Day_16', 'Day_20', 'Day_22', 'Day_30')","('high_negative_sentiment', 'sentiment_shift_detected')",5
+"('Day_9', 'Day_11', 'Day_13', 'Day_18', 'Day_20')","('anger_mentioned', 'policy_governance_discussion')",5
+"('Day_9', 'Day_12', 'Day_13', 'Day_18', 'Day_26')","('sadness_keywords_present', 'policy_governance_discussion', 'solidarity_messages')",5
+"('Day_11', 'Day_13', 'Day_18', 'Day_19', 'Day_20')","('traffic_congestion_detected', 'fear_keywords_present', 'policy_governance_discussion', 'emotion_with_mobility_signal')",5
+"('Day_12', 'Day_13', 'Day_18', 'Day_19', 'Day_26')","('traffic_congestion_detected', 'sadness_keywords_present', 'policy_governance_discussion')",5
+"('Day_14', 'Day_15', 'Day_21', 'Day_22', 'Day_28')","('policy_governance_discussion', 'weekend')",5
+"('Day_3', 'Day_5', 'Day_11', 'Day_13', 'Day_18', 'Day_20')","('fear_keywords_present', 'anger_mentioned')",6
+"('Day_3', 'Day_16', 'Day_20', 'Day_21', 'Day_24', 'Day_30')","('high_negative_sentiment', 'fear_keywords_present')",6
+"('Day_4', 'Day_5', 'Day_13', 'Day_18', 'Day_19', 'Day_21')","('fear_keywords_present', 'sadness_keywords_present')",6
+"('Day_4', 'Day_8', 'Day_17', 'Day_22', 'Day_26', 'Day_31')","('sentiment_shift_detected', 'sentiment_improved')",6
+"('Day_4', 'Day_12', 'Day_13', 'Day_18', 'Day_19', 'Day_26')","('traffic_congestion_detected', 'sadness_keywords_present')",6
+"('Day_9', 'Day_17', 'Day_18', 'Day_20', 'Day_22', 'Day_26')","('sentiment_shift_detected', 'policy_governance_discussion')",6
+"('Day_11', 'Day_12', 'Day_13', 'Day_17', 'Day_18', 'Day_26')","('traffic_congestion_detected', 'policy_governance_discussion', 'solidarity_messages')",6
+"('Day_0', 'Day_7', 'Day_16', 'Day_21', 'Day_22', 'Day_28', 'Day_30')","('high_negative_sentiment', 'emotion_mobility_mismatch')",7
+"('Day_3', 'Day_5', 'Day_9', 'Day_11', 'Day_13', 'Day_18', 'Day_20')","('anger_mentioned',)",7
+"('Day_4', 'Day_17', 'Day_18', 'Day_20', 'Day_26', 'Day_27', 'Day_31')","('traffic_congestion_detected', 'sentiment_shift_detected')",7
+"('Day_5', 'Day_6', 'Day_9', 'Day_12', 'Day_13', 'Day_18', 'Day_26')","('sadness_keywords_present', 'solidarity_messages')",7
+"('Day_5', 'Day_11', 'Day_13', 'Day_14', 'Day_16', 'Day_18', 'Day_24')","('fear_keywords_present', 'solidarity_messages')",7
+"('Day_6', 'Day_8', 'Day_9', 'Day_10', 'Day_15', 'Day_23', 'Day_29')","('solidarity_messages', 'low_emotion_low_mobility_signal')",7
+"('Day_7', 'Day_9', 'Day_16', 'Day_18', 'Day_20', 'Day_27', 'Day_30')","('sentiment_shift_detected', 'sentiment_worsened')",7
+"('Day_8', 'Day_9', 'Day_16', 'Day_17', 'Day_18', 'Day_26', 'Day_27')","('sentiment_shift_detected', 'solidarity_messages')",7
+"('Day_11', 'Day_13', 'Day_14', 'Day_18', 'Day_19', 'Day_20', 'Day_21')","('fear_keywords_present', 'policy_governance_discussion')",7
+"('Day_3', 'Day_4', 'Day_11', 'Day_13', 'Day_18', 'Day_19', 'Day_20', 'Day_24')","('traffic_congestion_detected', 'fear_keywords_present', 'emotion_with_mobility_signal')",8
+"('Day_9', 'Day_12', 'Day_13', 'Day_18', 'Day_19', 'Day_21', 'Day_26', 'Day_28')","('sadness_keywords_present', 'policy_governance_discussion')",8
+"('Day_11', 'Day_12', 'Day_13', 'Day_17', 'Day_18', 'Day_19', 'Day_20', 'Day_26')","('traffic_congestion_detected', 'policy_governance_discussion')",8
+"('Day_11', 'Day_12', 'Day_13', 'Day_17', 'Day_18', 'Day_24', 'Day_26', 'Day_27')","('traffic_congestion_detected', 'solidarity_messages')",8
+"('Day_0', 'Day_5', 'Day_7', 'Day_14', 'Day_16', 'Day_21', 'Day_22', 'Day_28', 'Day_30')","('emotion_mobility_mismatch',)",9
+"('Day_1', 'Day_2', 'Day_6', 'Day_8', 'Day_9', 'Day_10', 'Day_15', 'Day_23', 'Day_29')","('low_emotion_low_mobility_signal',)",9
+"('Day_1', 'Day_7', 'Day_8', 'Day_14', 'Day_15', 'Day_21', 'Day_22', 'Day_28', 'Day_29')","('weekend',)",9
+"('Day_3', 'Day_4', 'Day_11', 'Day_13', 'Day_18', 'Day_19', 'Day_20', 'Day_24', 'Day_25')","('traffic_congestion_detected', 'emotion_with_mobility_signal')",9
+"('Day_0', 'Day_3', 'Day_7', 'Day_16', 'Day_20', 'Day_21', 'Day_22', 'Day_24', 'Day_25', 'Day_28', 'Day_30')","('high_negative_sentiment',)",11
+"('Day_4', 'Day_5', 'Day_6', 'Day_9', 'Day_12', 'Day_13', 'Day_18', 'Day_19', 'Day_21', 'Day_26', 'Day_28')","('sadness_keywords_present',)",11
+"('Day_9', 'Day_10', 'Day_11', 'Day_12', 'Day_13', 'Day_14', 'Day_15', 'Day_17', 'Day_18', 'Day_23', 'Day_26')","('policy_governance_discussion', 'solidarity_messages')",11
+"('Day_3', 'Day_4', 'Day_5', 'Day_11', 'Day_13', 'Day_14', 'Day_16', 'Day_18', 'Day_19', 'Day_20', 'Day_21', 'Day_24', 'Day_30')","('fear_keywords_present',)",13
+"('Day_4', 'Day_7', 'Day_8', 'Day_9', 'Day_16', 'Day_17', 'Day_18', 'Day_20', 'Day_22', 'Day_26', 'Day_27', 'Day_30', 'Day_31')","('sentiment_shift_detected',)",13
+"('Day_3', 'Day_4', 'Day_11', 'Day_12', 'Day_13', 'Day_17', 'Day_18', 'Day_19', 'Day_20', 'Day_24', 'Day_25', 'Day_26', 'Day_27', 'Day_31')","('traffic_congestion_detected',)",14
+"('Day_9', 'Day_10', 'Day_11', 'Day_12', 'Day_13', 'Day_14', 'Day_15', 'Day_17', 'Day_18', 'Day_19', 'Day_20', 'Day_21', 'Day_22', 'Day_23', 'Day_26', 'Day_28')","('policy_governance_discussion',)",16
+"('Day_5', 'Day_6', 'Day_8', 'Day_9', 'Day_10', 'Day_11', 'Day_12', 'Day_13', 'Day_14', 'Day_15', 'Day_16', 'Day_17', 'Day_18', 'Day_23', 'Day_24', 'Day_26', 'Day_27', 'Day_29')","('solidarity_messages',)",18
+"('Day_0', 'Day_1', 'Day_2', 'Day_3', 'Day_4', 'Day_5', 'Day_6', 'Day_7', 'Day_8', 'Day_9', 'Day_10', 'Day_11', 'Day_12', 'Day_13', 'Day_14', 'Day_15', 'Day_16', 'Day_17', 'Day_18', 'Day_19', 'Day_20', 'Day_21', 'Day_22', 'Day_23', 'Day_24', 'Day_25', 'Day_26', 'Day_27', 'Day_28', 'Day_29', 'Day_30', 'Day_31', 'Day_32')",(),33
