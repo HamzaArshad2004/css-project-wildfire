@@ -5,12 +5,52 @@ Creates comprehensive visualizations of mobility, sentiment, and FCA results
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import matplotlib.patches as mpatches
 import seaborn as sns
 import numpy as np
 import json
 from pathlib import Path
 import warnings
 warnings.filterwarnings('ignore')
+
+# LA Wildfire 2025 crisis phase boundaries
+_PHASES = [
+    ("2025-01-03", "2025-01-06", "#fff3cd", "Pre-ignition"),
+    ("2025-01-07", "2025-01-11", "#ffd6d6", "Ignition & spread"),
+    ("2025-01-12", "2025-01-20", "#f4b8b8", "Peak crisis"),
+    ("2025-01-21", "2025-02-04", "#d6eaff", "Containment"),
+]
+
+_CRISIS_EVENTS = [
+    ("2025-01-07", "Fires ignite", "red"),
+    ("2025-01-12", "Peak evacuations", "darkred"),
+    ("2025-01-30", "80% contained", "steelblue"),
+]
+
+
+def _add_phase_bands(ax, alpha: float = 0.22) -> None:
+    """Shade LA wildfire crisis phases on a date-axis Axes."""
+    for start, end, color, label in _PHASES:
+        ax.axvspan(pd.to_datetime(start), pd.to_datetime(end),
+                   color=color, alpha=alpha, zorder=0)
+
+
+def _add_event_lines(ax) -> None:
+    """Draw vertical lines for key crisis events."""
+    for date_str, label, color in _CRISIS_EVENTS:
+        d = pd.to_datetime(date_str)
+        ax.axvline(d, color=color, linewidth=1.2, linestyle='--', alpha=0.7, zorder=1)
+        ax.text(d, ax.get_ylim()[1] * 0.97, label,
+                rotation=90, fontsize=6.5, color=color, va='top', ha='right', alpha=0.85)
+
+
+def _date_locator(ax) -> None:
+    """Weekly major ticks, daily minor ticks for a ~33-day range."""
+    ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=0))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %d"))
+    ax.xaxis.set_minor_locator(mdates.DayLocator())
+    ax.tick_params(axis='x', rotation=30, labelsize=8)
 
 # ========= CONFIG =========
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -72,34 +112,52 @@ class ResultsVisualizer:
         return cols
 
     def plot_mobility_trends(self):
-        """Plot mobility metrics over time"""
+        """Plot LA mobility metrics with 3-day rolling average and crisis phase shading."""
         print("\n📈 Creating mobility trends plot...")
 
-        fig, axes = plt.subplots(2, 2, figsize=(15, 10))
-        fig.suptitle('Mobility Trends During LA Wildfire Crisis', fontsize=16, fontweight='bold')
-
-        delay_col = None
-        for col in ["Delay (V_t=35) (Veh-Hours)", "Delay (V_t=35)"]:
-            if col in self.mobility_df.columns:
-                delay_col = col
-                break
-
+        delay_col = next(
+            (c for c in ["Delay (V_t=35) (Veh-Hours)", "Delay (V_t=35)"]
+             if c in self.mobility_df.columns), None
+        )
         metrics = [
-            ('VMT (Veh-Miles)', '#1f77b4', 'VMT'),
-            ('TTI', '#ff7f0e', 'TTI'),
-            ('VHT (Veh-Hours)', '#2ca02c', 'VHT'),
-            (delay_col if delay_col else 'TTI', '#d62728', 'Delay'),
+            ('VMT (Veh-Miles)', '#1f77b4', 'VMT (Vehicle Miles Traveled)'),
+            ('TTI', '#ff7f0e', 'TTI (Travel Time Index)'),
+            ('VHT (Veh-Hours)', '#2ca02c', 'VHT (Vehicle Hours Traveled)'),
+            (delay_col, '#d62728', 'Delay (Veh-Hours)'),
         ]
+        metrics = [(m, c, l) for m, c, l in metrics if m and m in self.mobility_df.columns]
 
-        for idx, (metric, color, label) in enumerate(metrics):
-            if metric and metric in self.mobility_df.columns:
-                ax = axes[idx // 2, idx % 2]
-                ax.plot(self.mobility_df['Date'], self.mobility_df[metric], color=color, linewidth=2, marker='o', markersize=4)
-                ax.set_title(label, fontsize=12, fontweight='bold')
-                ax.set_xlabel('Date', fontsize=10)
-                ax.set_ylabel(label, fontsize=10)
-                ax.grid(True, alpha=0.3)
-                ax.tick_params(axis='x', rotation=45)
+        fig, axes = plt.subplots(2, 2, figsize=(16, 10))
+        axes_flat = axes.flatten()
+        fig.suptitle('LA Wildfire 2025 — Traffic Mobility Metrics (Jan–Feb 2025)',
+                     fontsize=14, fontweight='bold', y=1.01)
+
+        for ax_i, (metric, color, label) in enumerate(metrics[:4]):
+            ax = axes_flat[ax_i]
+            series = self.mobility_df.set_index('Date')[metric].sort_index()
+            roll3 = series.rolling(3, center=True, min_periods=1).mean()
+
+            _add_phase_bands(ax)
+            ax.plot(series.index, series.values,
+                    color=color, linewidth=0.7, alpha=0.4, label='Daily')
+            ax.plot(roll3.index, roll3.values,
+                    color=color, linewidth=2.2, label='3-day avg')
+            _add_event_lines(ax)
+
+            ax.set_title(label, fontsize=10, fontweight='bold')
+            ax.set_ylabel(label.split('(')[0].strip(), fontsize=9)
+            ax.legend(fontsize=8, loc='upper right')
+            ax.grid(True, alpha=0.25, axis='y')
+            _date_locator(ax)
+
+        # Hide unused subplots
+        for ax_i in range(len(metrics), 4):
+            axes_flat[ax_i].set_visible(False)
+
+        phase_patches = [mpatches.Patch(color=c, alpha=0.6, label=l)
+                         for _, _, c, l in _PHASES]
+        fig.legend(handles=phase_patches, loc='lower center', ncol=4,
+                   fontsize=8, framealpha=0.9, bbox_to_anchor=(0.5, -0.03))
 
         plt.tight_layout()
         output_file = OUTPUT_DIR / 'mobility_trends.png'
@@ -109,27 +167,69 @@ class ResultsVisualizer:
         print(f"  ✓ Saved to {output_file}")
 
     def plot_sentiment_timeline(self):
-        """Plot sentiment over time"""
+        """Sentiment timeline with 3-day rolling average and crisis phase shading."""
         print("💭 Creating sentiment timeline...")
 
-        fig, ax = plt.subplots(figsize=(14, 6))
+        if 'avg_compound' not in self.features_df.columns:
+            print("  ⚠️  avg_compound column not found; skipping")
+            return
 
-        if 'avg_compound' in self.features_df.columns:
-            ax.plot(self.features_df['Date'], self.features_df['avg_compound'], label='Compound Sentiment', linewidth=2.5, marker='o', color='purple', markersize=5)
+        df = self.features_df.set_index('Date').sort_index()
 
-            if 'neg_fraction' in self.features_df.columns:
-                ax.plot(self.features_df['Date'], self.features_df['neg_fraction'], label='Negative Fraction', linewidth=2, marker='s', color='red', alpha=0.7, markersize=4)
+        fig, axes = plt.subplots(2, 1, figsize=(14, 9), sharex=True)
+        fig.suptitle('Reddit Sentiment During LA Wildfire Crisis (Jan–Feb 2025)',
+                     fontsize=13, fontweight='bold')
 
-            if 'pos_fraction' in self.features_df.columns:
-                ax.plot(self.features_df['Date'], self.features_df['pos_fraction'], label='Positive Fraction', linewidth=2, marker='^', color='green', alpha=0.7, markersize=4)
+        # Panel 1: Compound sentiment
+        ax1 = axes[0]
+        compound = df['avg_compound']
+        roll3 = compound.rolling(3, center=True, min_periods=1).mean()
 
-        ax.axhline(y=0, color='black', linestyle='--', alpha=0.3)
-        ax.set_title('Daily Sentiment from Reddit Posts', fontsize=14, fontweight='bold')
-        ax.set_xlabel('Date', fontsize=12)
-        ax.set_ylabel('Sentiment Score', fontsize=12)
-        ax.legend(loc='best')
-        ax.grid(True, alpha=0.3)
-        plt.xticks(rotation=45)
+        _add_phase_bands(ax1)
+        ax1.fill_between(compound.index, compound.values, 0,
+                         where=compound.values >= 0, alpha=0.15, color='green')
+        ax1.fill_between(compound.index, compound.values, 0,
+                         where=compound.values < 0, alpha=0.15, color='red')
+        ax1.plot(compound.index, compound.values,
+                 color='slategray', linewidth=0.6, alpha=0.4, label='Daily')
+        ax1.plot(roll3.index, roll3.values,
+                 color='purple', linewidth=2.2, label='3-day avg')
+        ax1.axhline(0, color='black', linewidth=0.9, linestyle='--', alpha=0.5)
+        _add_event_lines(ax1)
+        ax1.set_ylabel('Compound Score', fontsize=10)
+        ax1.set_ylim(-1.1, 1.1)
+        ax1.legend(fontsize=9, loc='lower right')
+        ax1.grid(True, alpha=0.2, axis='y')
+        ax1.set_title('Compound Sentiment', fontsize=10)
+
+        # Panel 2: Positive vs Negative fractions
+        ax2 = axes[1]
+        _add_phase_bands(ax2)
+        if 'pos_fraction' in df.columns:
+            pos_r = df['pos_fraction'].rolling(3, center=True, min_periods=1).mean()
+            ax2.plot(df.index, df['pos_fraction'].values,
+                     color='green', linewidth=0.5, alpha=0.3)
+            ax2.plot(pos_r.index, pos_r.values,
+                     color='green', linewidth=2, label='Positive (3-day avg)')
+        if 'neg_fraction' in df.columns:
+            neg_r = df['neg_fraction'].rolling(3, center=True, min_periods=1).mean()
+            ax2.plot(df.index, df['neg_fraction'].values,
+                     color='red', linewidth=0.5, alpha=0.3)
+            ax2.plot(neg_r.index, neg_r.values,
+                     color='red', linewidth=2, label='Negative (3-day avg)')
+        _add_event_lines(ax2)
+        ax2.set_ylabel('Fraction of Posts', fontsize=10)
+        ax2.legend(fontsize=9, loc='upper right')
+        ax2.grid(True, alpha=0.2, axis='y')
+        ax2.set_title('Positive vs Negative Post Fraction', fontsize=10)
+
+        _date_locator(ax2)
+        ax2.set_xlabel('Date', fontsize=10)
+
+        phase_patches = [mpatches.Patch(color=c, alpha=0.6, label=l)
+                         for _, _, c, l in _PHASES]
+        fig.legend(handles=phase_patches, loc='lower center', ncol=4,
+                   fontsize=8, framealpha=0.9, bbox_to_anchor=(0.5, -0.02))
 
         plt.tight_layout()
         output_file = OUTPUT_DIR / 'sentiment_timeline.png'
@@ -139,45 +239,67 @@ class ResultsVisualizer:
         print(f"  ✓ Saved to {output_file}")
 
     def plot_features_heatmap(self):
-        """Create heatmap of binary features"""
+        """Heatmap of binary features with daily resolution (33 days is readable)."""
         print("🔥 Creating features heatmap...")
 
         binary_cols = self.binary_columns(self.features_df, exclude={'Date', 'num_posts'})
-
-        if len(binary_cols) == 0:
+        if not binary_cols:
             print("  ⚠️  No binary columns found, skipping heatmap")
             return
 
         preferred_order = [
-            'high_negative_sentiment', 'fear_keywords_present', 'anger_mentioned',
-            'traffic_congestion_detected', 'mobility_drop_traffic',
-            'evacuation_pattern_observed', 'policy_governance_discussion',
-            'solidarity_messages', 'sentiment_shift_detected',
+            'traffic_congestion_detected', 'evacuation_mentioned',
             'emotion_with_mobility_signal', 'emotion_mobility_mismatch',
-            'evacuation_mentioned', 'weekend',
+            'low_emotion_low_mobility_signal',
+            'dominant_emotion_fear', 'high_negative_sentiment',
+            'fear_keywords_present', 'anger_mentioned',
+            'anxiety_keywords_present', 'sadness_keywords_present',
+            'sentiment_shift_detected', 'sentiment_worsened', 'sentiment_improved',
+            'high_positive_sentiment', 'mixed_emotions',
+            'solidarity_messages', 'policy_governance_discussion',
+            'weekend',
         ]
-        binary_cols = [c for c in preferred_order if c in binary_cols]
+        ordered_cols = [c for c in preferred_order if c in binary_cols]
+        remaining = [c for c in binary_cols if c not in ordered_cols]
+        ordered_cols = ordered_cols + remaining
 
-        if len(binary_cols) == 0:
-            print("  ⚠️  No selected binary columns found, skipping heatmap")
-            return
+        df_indexed = self.features_df.set_index('Date')[ordered_cols].sort_index()
 
-        binary_matrix = self.features_df[binary_cols]
-
-        plt.figure(figsize=(14, 10))
-        sns.heatmap(
-            binary_matrix.T,
+        fig, ax = plt.subplots(figsize=(max(14, len(df_indexed) * 0.45), 8))
+        im = ax.imshow(
+            df_indexed.T.values,
+            aspect='auto',
             cmap='RdYlGn_r',
-            cbar_kws={'label': 'Feature Active'},
-            yticklabels=binary_cols,
-            xticklabels=[f"D{i + 1}" for i in range(len(binary_matrix))],
+            vmin=0, vmax=1,
+            interpolation='nearest',
         )
 
-        plt.title('Binary Feature Activation Heatmap', fontsize=14, fontweight='bold')
-        plt.xlabel('Days', fontsize=12)
-        plt.ylabel('Features', fontsize=12)
-        plt.tight_layout()
+        # Y: feature names
+        ax.set_yticks(range(len(ordered_cols)))
+        ax.set_yticklabels(ordered_cols, fontsize=8)
 
+        # X: daily dates — show every 3rd
+        dates = df_indexed.index.tolist()
+        tick_pos = list(range(0, len(dates), 3))
+        ax.set_xticks(tick_pos)
+        ax.set_xticklabels([dates[i].strftime('%b %d') for i in tick_pos],
+                           rotation=35, fontsize=8)
+
+        # Phase boundary lines
+        for start_str, _, _, _ in _PHASES[1:]:
+            phase_ts = pd.Timestamp(start_str)
+            diffs = [(abs((d - phase_ts).days), i) for i, d in enumerate(dates)]
+            closest_i = min(diffs)[1]
+            ax.axvline(closest_i - 0.5, color='white', linewidth=1.8, alpha=0.8)
+
+        cbar = fig.colorbar(im, ax=ax, fraction=0.015, pad=0.01)
+        cbar.set_label('Feature active (1) / inactive (0)', fontsize=9)
+        ax.set_title('Feature Activation Heatmap — LA Wildfire 2025 (daily)',
+                     fontsize=13, fontweight='bold')
+        ax.set_xlabel('Date', fontsize=10)
+        ax.set_ylabel('Feature', fontsize=10)
+
+        plt.tight_layout()
         output_file = OUTPUT_DIR / 'features_heatmap.png'
         output_file.parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(output_file, dpi=300, bbox_inches='tight')
@@ -185,36 +307,195 @@ class ResultsVisualizer:
         print(f"  ✓ Saved to {output_file}")
 
     def plot_combined_mobility_sentiment(self):
-        """Plot mobility and sentiment together"""
+        """Three-panel: VMT, compound sentiment, key binary signals with phase shading."""
         print("🔗 Creating combined mobility-sentiment plot...")
 
-        merged = self.features_df[['Date', 'avg_compound']].merge(
-            self.mobility_df[['Date', 'VMT (Veh-Miles)']],
-            on='Date',
-            how='outer',
-        )
+        mob = self.mobility_df.set_index('Date').sort_index()
+        feat = self.features_df.set_index('Date').sort_index()
 
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 10), sharex=True)
+        fig, axes = plt.subplots(3, 1, figsize=(15, 11), sharex=True)
+        fig.suptitle('LA Wildfire 2025 — Mobility, Sentiment & Key Signals',
+                     fontsize=13, fontweight='bold')
 
-        color1 = '#1f77b4'
-        ax1.plot(merged['Date'], merged['VMT (Veh-Miles)'], color=color1, linewidth=2.5, marker='o', markersize=5)
-        ax1.set_ylabel('Vehicle Miles Traveled (VMT)', color=color1, fontsize=12, fontweight='bold')
-        ax1.tick_params(axis='y', labelcolor=color1)
-        ax1.grid(True, alpha=0.3)
-        ax1.set_title('Mobility vs Sentiment During Crisis', fontsize=14, fontweight='bold')
+        # Panel 1: VMT
+        ax1 = axes[0]
+        if 'VMT (Veh-Miles)' in mob.columns:
+            vmt = mob['VMT (Veh-Miles)']
+            roll3 = vmt.rolling(3, center=True, min_periods=1).mean()
+            _add_phase_bands(ax1)
+            ax1.plot(vmt.index, vmt.values, color='#1f77b4', linewidth=0.6, alpha=0.35)
+            ax1.plot(roll3.index, roll3.values, color='#1f77b4', linewidth=2.2,
+                     label='VMT (3-day avg)')
+            _add_event_lines(ax1)
+        ax1.set_ylabel('Veh-Miles', fontsize=10)
+        ax1.legend(fontsize=9, loc='lower right')
+        ax1.grid(True, alpha=0.2, axis='y')
+        ax1.set_title('Vehicle Miles Traveled', fontsize=10)
 
-        color2 = '#d62728'
-        ax2.plot(merged['Date'], merged['avg_compound'], color=color2, linewidth=2.5, marker='s', markersize=5)
-        ax2.axhline(y=0, color='black', linestyle='--', alpha=0.3)
-        ax2.set_ylabel('Sentiment (Compound)', color=color2, fontsize=12, fontweight='bold')
-        ax2.set_xlabel('Date', fontsize=12, fontweight='bold')
-        ax2.tick_params(axis='y', labelcolor=color2)
-        ax2.grid(True, alpha=0.3)
+        # Panel 2: Compound sentiment
+        ax2 = axes[1]
+        if 'avg_compound' in feat.columns:
+            compound = feat['avg_compound']
+            roll3 = compound.rolling(3, center=True, min_periods=1).mean()
+            _add_phase_bands(ax2)
+            ax2.fill_between(compound.index, compound.values, 0,
+                             where=compound.values >= 0, alpha=0.12, color='green')
+            ax2.fill_between(compound.index, compound.values, 0,
+                             where=compound.values < 0, alpha=0.12, color='red')
+            ax2.plot(compound.index, compound.values,
+                     color='slategray', linewidth=0.5, alpha=0.35)
+            ax2.plot(roll3.index, roll3.values, color='purple', linewidth=2.2,
+                     label='Compound sentiment (3-day avg)')
+            ax2.axhline(0, color='black', linewidth=0.8, linestyle='--', alpha=0.4)
+            _add_event_lines(ax2)
+        ax2.set_ylabel('Sentiment score', fontsize=10)
+        ax2.set_ylim(-1.1, 1.1)
+        ax2.legend(fontsize=9, loc='lower right')
+        ax2.grid(True, alpha=0.2, axis='y')
+        ax2.set_title('Reddit Compound Sentiment', fontsize=10)
 
-        plt.xticks(rotation=45)
+        # Panel 3: Binary signals
+        ax3 = axes[2]
+        _add_phase_bands(ax3)
+        binary_signals = [
+            ('traffic_congestion_detected', '#e07b39', 'Traffic congestion'),
+            ('evacuation_mentioned', '#d62728', 'Evacuation mentioned'),
+            ('solidarity_messages', '#2ca02c', 'Solidarity messages'),
+        ]
+        offsets = [0.75, 0.45, 0.15]
+        for (col, color, label), offset in zip(binary_signals, offsets):
+            if col in feat.columns:
+                active_days = feat.index[feat[col] == 1]
+                ax3.scatter(active_days, [offset] * len(active_days),
+                            color=color, s=60, alpha=0.8, label=label, zorder=3)
+        ax3.set_yticks(offsets)
+        ax3.set_yticklabels(['Traffic\ncongestion', 'Evacuation\nmentioned', 'Solidarity\nmessages'],
+                            fontsize=8)
+        ax3.set_ylim(0, 1)
+        ax3.legend(fontsize=8, loc='lower right')
+        ax3.grid(True, alpha=0.2, axis='y')
+        ax3.set_title('Key Binary Signals', fontsize=10)
+        _add_event_lines(ax3)
+
+        _date_locator(ax3)
+        ax3.set_xlabel('Date', fontsize=10)
+
+        phase_patches = [mpatches.Patch(color=c, alpha=0.6, label=l)
+                         for _, _, c, l in _PHASES]
+        fig.legend(handles=phase_patches, loc='lower center', ncol=4,
+                   fontsize=8, framealpha=0.9, bbox_to_anchor=(0.5, -0.02))
+
         plt.tight_layout()
-
         output_file = OUTPUT_DIR / 'combined_analysis.png'
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(output_file, dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"  ✓ Saved to {output_file}")
+
+    def plot_rules_overview(self):
+        """Bubble chart: support vs confidence, bubble size = lift², colour = cross-domain."""
+        print("🔵 Creating rules overview chart...")
+
+        rules_path_options = [
+            EVALUATED_RULES_FILE,
+            RULES_FILE,
+        ]
+        rules_df = None
+        for p in rules_path_options:
+            if p.exists():
+                rules_df = pd.read_csv(p)
+                break
+        if rules_df is None or len(rules_df) == 0:
+            print("  ⚠️  No rules file found; skipping rules overview")
+            return
+
+        fig, ax = plt.subplots(figsize=(11, 7))
+        is_cross = rules_df['cross_domain'].astype(str).str.lower().isin(['true', '1', 'yes'])
+        for cross_domain, group in rules_df.groupby(is_cross):
+            color = '#e07b39' if cross_domain else '#5b9bd5'
+            label = 'Cross-domain' if cross_domain else 'Same-domain'
+            sizes = (group['lift'].clip(lower=1) ** 2) * 60
+            x = group['support_pct'] if 'support_pct' in group.columns else group['support'] * 100
+            ax.scatter(x, group['confidence'],
+                       s=sizes, c=color, alpha=0.75,
+                       edgecolors='white', linewidths=0.5, label=label)
+
+        # Annotate top rules by lift
+        top = rules_df.nlargest(min(6, len(rules_df)), 'lift')
+        for _, row in top.iterrows():
+            x = row.get('support_pct', row['support'] * 100)
+            premise_short = str(row['premise'])[:35] + ('…' if len(str(row['premise'])) > 35 else '')
+            ax.annotate(premise_short, (x, row['confidence']),
+                        fontsize=6.5, ha='left', va='bottom',
+                        xytext=(4, 3), textcoords='offset points', color='#333')
+
+        ax.set_xlabel('Support (%)', fontsize=11)
+        ax.set_ylabel('Confidence (%)', fontsize=11)
+        ax.set_title('FCA Association Rules — Support vs Confidence\n(bubble size = lift²)',
+                     fontsize=12, fontweight='bold')
+        ax.legend(fontsize=10)
+        ax.grid(True, alpha=0.25)
+
+        plt.tight_layout()
+        output_file = OUTPUT_DIR / 'rules_overview.png'
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(output_file, dpi=300, bbox_inches='tight')
+        plt.close()
+        print(f"  ✓ Saved to {output_file}")
+
+    def plot_feature_activation(self):
+        """Horizontal bar chart of feature activation rates, colour-coded by domain."""
+        print("📊 Creating feature activation chart...")
+
+        binary_cols = self.binary_columns(self.features_df, exclude={'Date', 'num_posts'})
+        if not binary_cols:
+            print("  ⚠️  No binary columns found; skipping")
+            return
+
+        rates = self.features_df[binary_cols].mean().sort_values(ascending=True) * 100
+
+        mobility_features = {'traffic_congestion_detected', 'evacuation_mentioned'}
+        emotion_features = {
+            'high_negative_sentiment', 'high_positive_sentiment', 'sentiment_improved',
+            'sentiment_worsened', 'sentiment_shift_detected', 'dominant_emotion_fear',
+            'mixed_emotions', 'fear_keywords_present', 'anger_mentioned',
+            'anxiety_keywords_present', 'sadness_keywords_present', 'solidarity_messages',
+        }
+        topic_features = {'policy_governance_discussion'}
+        colors = []
+        for feat in rates.index:
+            if feat in mobility_features:
+                colors.append('#1f77b4')
+            elif feat in emotion_features:
+                colors.append('#d62728')
+            elif feat in topic_features:
+                colors.append('#2ca02c')
+            else:
+                colors.append('#9467bd')
+
+        fig, ax = plt.subplots(figsize=(10, max(5, len(rates) * 0.38)))
+        bars = ax.barh(rates.index, rates.values, color=colors, alpha=0.82, edgecolor='white')
+        for bar, val in zip(bars, rates.values):
+            ax.text(val + 0.5, bar.get_y() + bar.get_height() / 2,
+                    f'{val:.0f}%', va='center', fontsize=8)
+
+        ax.set_xlabel('% of days active', fontsize=10)
+        ax.set_title('Feature Activation Rates — LA Wildfire 2025 (33 days)',
+                     fontsize=12, fontweight='bold')
+        ax.set_xlim(0, 108)
+        ax.grid(True, alpha=0.2, axis='x')
+        ax.axvline(50, color='black', linewidth=0.8, linestyle='--', alpha=0.4)
+
+        legend_patches = [
+            mpatches.Patch(color='#1f77b4', label='Mobility'),
+            mpatches.Patch(color='#d62728', label='Emotion/Sentiment'),
+            mpatches.Patch(color='#2ca02c', label='Topic/Discourse'),
+            mpatches.Patch(color='#9467bd', label='Composite'),
+        ]
+        ax.legend(handles=legend_patches, fontsize=9, loc='lower right')
+
+        plt.tight_layout()
+        output_file = OUTPUT_DIR / 'feature_activation.png'
         output_file.parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(output_file, dpi=300, bbox_inches='tight')
         plt.close()
@@ -314,6 +595,8 @@ def main():
     visualizer.plot_sentiment_timeline()
     visualizer.plot_features_heatmap()
     visualizer.plot_combined_mobility_sentiment()
+    visualizer.plot_rules_overview()
+    visualizer.plot_feature_activation()
     visualizer.create_summary_report()
 
     print("\n" + "=" * 70)

@@ -60,8 +60,24 @@ TOP_N_LLM = 20
 
 BATCH_SYSTEM_PROMPT = textwrap.dedent("""\
     You are an expert data scientist and emergency management policy advisor
-    reviewing association rules mined from crisis behavior data during the
-    2025 LA wildfires. The dataset covers 33 days and combines:
+    reviewing association rules mined from LA Wildfire 2025 crisis behavior data
+    (January 3 – February 4, 2025). The dataset covers 33 days and combines
+    daily LA traffic metrics (VMT, TTI) with Reddit sentiment signals from
+    local subreddits.
+
+    ── LA WILDFIRE 2025 CRISIS TIMELINE ──────────────────────────────────────
+    Phase 1 — Pre-ignition (Jan 3–6):
+      Baseline conditions; routine traffic; no elevated fear signals.
+    Phase 2 — Ignition & rapid spread (Jan 7–11):
+      Palisades and Eaton fires ignite Jan 7; mandatory evacuation orders;
+      traffic congestion spikes; fear and anger peak on Reddit.
+    Phase 3 — Peak crisis (Jan 12–20):
+      Largest active footprint; ~180,000 residents under evacuation orders;
+      TTI and VHT at maximum; solidarity messaging surges.
+    Phase 4 — Containment & recovery (Jan 21–Feb 4):
+      Progressive containment; return-home orders issued; VMT normalises;
+      positive sentiment begins to recover.
+    ──────────────────────────────────────────────────────────────────────────
 
     MOBILITY features: traffic_congestion_detected, evacuation_mentioned
     SOCIAL/EMOTION features: fear_keywords_present, anger_mentioned,
@@ -75,44 +91,58 @@ BATCH_SYSTEM_PROMPT = textwrap.dedent("""\
       emotion_mobility_mismatch    = (any emotion) AND NOT (any mobility signal)
       low_emotion_low_mobility_signal = NOT(emotion) AND NOT(mobility)
 
-    YOUR TASK: from the numbered candidate rules below, select and rank the
-    TOP 20 that best satisfy ALL of the following criteria:
-      1. DIRECTIONAL -- the rule reveals a genuine cause-effect or co-occurrence
-         signal (e.g. emotion predicting mobility, or mobility predicting emotion)
-      2. NON-OBVIOUS -- the association would surprise an emergency manager
-      3. POLICY-ACTIONABLE -- it suggests a concrete intervention
-      4. CROSS-DOMAIN -- at least one feature from mobility AND one from social/emotion
+    ── NOVELTY SCORING RUBRIC (1–10) ─────────────────────────────────────────
+    10 — Cross-domain rule that reveals a counter-intuitive direction
+         (e.g. solidarity messaging predicts traffic reduction, or fear
+         keywords predict evacuation mentions with a specific crisis phase link).
+     8–9 — Cross-domain with a non-obvious direction; timing aligns with a
+         known phase but the association would surprise an emergency manager.
+     6–7 — Single-domain but reveals non-trivial co-occurrence within the
+         33-day crisis window.
+     4–5 — Expected co-occurrence (e.g. fear + high negative sentiment).
+     1–3 — Near-tautological or definitionally implied.
+    ──────────────────────────────────────────────────────────────────────────
 
-    MANDATORY EXCLUSIONS (do not select these rule types):
-      - Any rule where emotion_with_mobility_signal or emotion_mobility_mismatch
-        is in the PREMISE and traffic/evacuation is the CONCLUSION
-        (tautological unpacking of composite features)
-      - Rules concluding sentiment_shift_detected when sentiment_improved or
-        sentiment_worsened is in the premise (definitional)
-      - Rules where the same feature domain appears in both premise and conclusion
-        with no cross-domain element
-      - No more than 3 rules with the same conclusion
+    ── POLICY RELEVANCE SCORING RUBRIC (1–10) ────────────────────────────────
+    10 — Finding is directly actionable by a named LA agency (LAFD, CAL FIRE,
+         LA County OES, LAPD, LA DPW) with a specific trigger and action.
+     8–9 — Operationally useful; named agency and action obvious but needs
+         one additional validation step.
+     6–7 — Useful monitoring signal; further validation required.
+     4–5 — Situational awareness only; no clear intervention opportunity.
+     1–3 — Too generic or too rare to drive agency action.
+    ──────────────────────────────────────────────────────────────────────────
+
+    MANDATORY EXCLUSIONS — do NOT select rules where:
+    - emotion_with_mobility_signal or emotion_mobility_mismatch is in the
+      PREMISE and traffic/evacuation is the CONCLUSION (tautological unpacking).
+    - Rules concluding sentiment_shift_detected when sentiment_improved or
+      sentiment_worsened is in the premise (definitional).
+    - Both premise and conclusion are purely within one domain with no
+      cross-domain element.
+    - More than 3 rules share the same conclusion.
 
     PREFER:
-      - Emotion to mobility direction (social signal predicts physical behavior)
-      - Mobility to emotion direction (physical disruption predicts sentiment shift)
-      - Temporal patterns (weekend effects on crisis response)
-      - Surprising combinations (e.g. solidarity co-occurring with congestion,
-        or fear predicting evacuation mentions with high lift)
-      - Rules with lift > 1.5 and support on multiple days
+    - Emotion → mobility direction (social signal predicts physical response).
+    - Mobility → emotion direction (physical disruption predicts sentiment shift).
+    - Solidarity or policy discourse as surprising predictors.
+    - Rules with lift > 1.5 and support across multiple days.
+
+    YOUR TASK: select and rank the TOP 20 most novel and policy-relevant rules.
 
     Return ONLY a JSON array of exactly 20 objects (fewer if fewer qualify),
     ordered best-first:
     [
       {
-        "rule_id": <int -- the id field from the candidate list>,
+        "rule_id": <int>,
         "novelty_score": <int 1-10>,
         "policy_score": <int 1-10>,
-        "reasoning": "<1-2 sentences: what makes this finding novel -- be specific>",
-        "policy_recommendation": "<1-2 concrete sentences: specific action an LA emergency manager or policy official should take>"
+        "reasoning": "<2-3 sentences: name the LA crisis phase, explain why the direction is non-obvious, and what it reveals about crisis behaviour>",
+        "policy_recommendation": "<2 sentences: name a specific LA agency, state the exact monitoring trigger and the recommended action>"
       },
       ...
     ]
+    No markdown fences. No extra text. Valid JSON only.
 """)
 
 
@@ -152,13 +182,17 @@ def tag_cross_domain(df: pd.DataFrame) -> pd.DataFrame:
 def _build_candidate_block(df: pd.DataFrame) -> str:
     """Render candidate rules as a numbered text block for the LLM prompt."""
     lines = []
+    has_conviction = "conviction" in df.columns
     for _, row in df.iterrows():
         cross = "YES" if row.get("cross_domain") else "NO"
+        conviction_str = ""
+        if has_conviction and pd.notna(row.get("conviction")):
+            conviction_str = f" conviction={float(row['conviction']):.2f}"
         lines.append(
             f"[id={int(row['rule_id'])}] IF: {row['premise']} THEN: {row['conclusion']} "
             f"| support={int(row['support'])}d ({float(row['support_pct']):.1f}%) "
-            f"confidence={float(row['confidence']):.1f}% lift={float(row['lift']):.2f} "
-            f"cross_domain={cross}"
+            f"confidence={float(row['confidence']):.1f}% lift={float(row['lift']):.2f}"
+            f"{conviction_str} cross_domain={cross}"
         )
     return "\n".join(lines)
 
@@ -308,12 +342,33 @@ def write_summary(df: pd.DataFrame, out_path: Path, top_n: int = TOP_N_LLM) -> N
         )
         header_note = f"  Top {top_n} Rules by Statistical Ranking (cross-domain priority)\n"
 
+    total_rules = len(df)
+    cross_domain_count = int(df["cross_domain"].sum()) if "cross_domain" in df.columns else "N/A"
+    avg_lift = df["lift"].mean() if "lift" in df.columns else None
+    avg_conf = df["confidence"].mean() if "confidence" in df.columns else None
+
     with open(out_path, "w") as f:
         f.write("=" * 72 + "\n")
         f.write("  TOP RULES -- CROSS-DOMAIN MOBILITY x EMOTION ANALYSIS\n")
-        f.write("  LA WILDFIRES 2025\n")
+        f.write("  LA WILDFIRES 2025 (Jan 3 – Feb 4, 2025 | 33 days)\n")
         f.write(header_note)
         f.write("=" * 72 + "\n\n")
+
+        # Pipeline quality summary
+        f.write("── RULE PIPELINE QUALITY SUMMARY ───────────────────────────────\n")
+        f.write(f"  Total rules mined   : {total_rules}\n")
+        f.write(f"  Cross-domain rules  : {cross_domain_count}"
+                f" ({100 * cross_domain_count / max(total_rules, 1):.1f}%)\n")
+        if avg_lift is not None:
+            f.write(f"  Mean lift           : {avg_lift:.2f}\n")
+        if avg_conf is not None:
+            f.write(f"  Mean confidence     : {avg_conf:.1f}%\n")
+        if llm_selected:
+            avg_novelty = ranked["novelty_score"].mean()
+            avg_policy = ranked["policy_score"].mean()
+            f.write(f"  LLM avg novelty     : {avg_novelty:.1f}/10\n")
+            f.write(f"  LLM avg policy      : {avg_policy:.1f}/10\n")
+        f.write("─" * 72 + "\n\n")
 
         for i, (_, rule) in enumerate(ranked.iterrows(), start=1):
             cross = " [CROSS-DOMAIN]" if rule.get("cross_domain") else ""
@@ -331,10 +386,10 @@ def write_summary(df: pd.DataFrame, out_path: Path, top_n: int = TOP_N_LLM) -> N
                     f.write(f"  LLM: novelty={int(novelty)}/10  policy_relevance={int(policy)}/10\n")
                 reasoning = rule.get("llm_reasoning", "")
                 if reasoning and str(reasoning).strip():
-                    f.write(f"  Why it matters: {reasoning}\n")
+                    f.write(f"  Insight: {reasoning}\n")
                 rec = rule.get("llm_policy_recommendation", "")
                 if rec and str(rec).strip():
-                    f.write(f"  Policy recommendation: {rec}\n")
+                    f.write(f"  Recommendation: {rec}\n")
             f.write("\n")
 
     print(f"Summary written to {out_path}")

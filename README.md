@@ -1,6 +1,6 @@
 # LA Wildfire Crisis Analysis — FCA + LLM Rule Evaluation
 
-Formal Concept Analysis (FCA) of mobility and online emotional behavior during the **January 2025 LA wildfires**, with GPT-4o-mini batch selection of the most novel and policy-relevant cross-domain association rules.
+Formal Concept Analysis (FCA) of mobility and online emotional behavior during the **January–February 2025 LA wildfires**, with GPT-4o-mini batch selection of the most novel and policy-relevant cross-domain association rules.
 
 ---
 
@@ -13,14 +13,17 @@ Formal Concept Analysis (FCA) of mobility and online emotional behavior during t
 ## Pipeline
 
 ```
-collect_mobility_data.py   ─┐
-collect_reddit_data.py      ├─► preprocess_and_features.py ─► fca_analysis.py
-                            │                                        │
-                            └────────────────────────────────────────┘
-                                                                     │
-                                                            evaluate_rules_llm.py
-                                                                     │
-                                                            visualize_results.py
+Step 1             Step 2                    Step 3            Step 4
+collect_           collect_         ┌──►  preprocess_     ──► fca_
+mobility_data.py   reddit_data.py ──┘     and_features.py     analysis.py
+                                                                   │
+                                                          Step 5   ▼
+                                                     evaluate_rules_llm.py
+                                                          (LLM scoring)
+                                                                   │
+                                                          Step 6   ▼
+                                                     visualize_results.py
+                                                       (6 charts + report)
 ```
 
 ---
@@ -29,8 +32,19 @@ collect_reddit_data.py      ├─► preprocess_and_features.py ─► fca_anal
 
 | Source | Description | Period |
 |--------|-------------|--------|
-| LA/CA Caltrans PeMS | Daily VMT, VHT, TTI, vehicle delay | Jan 2025 (33 days) |
-| Reddit r/LosAngeles, r/wildfires | Wildfire posts scraped by PRAW | Jan 2025 (33 days) |
+| LA/CA Caltrans PeMS | Daily VMT, VHT, TTI, vehicle delay | Jan 3 – Feb 4 2025 (33 days) |
+| Reddit r/LosAngeles, r/wildfires | Wildfire posts scraped by PRAW | Jan 3 – Feb 4 2025 (33 days) |
+
+---
+
+## Crisis Timeline (4 Phases)
+
+| Phase | Dates | Key Events |
+|-------|-------|-----------|
+| Pre-ignition | Jan 3–6 | Baseline conditions; routine traffic |
+| Ignition & rapid spread | Jan 7–11 | Palisades + Eaton fires ignite; first evacuations; fear/anger spike |
+| Peak crisis | Jan 12–20 | ~180,000 residents evacuated; TTI/VHT peak; solidarity surges |
+| Containment & recovery | Jan 21–Feb 4 | Progressive containment; return orders; VMT normalises |
 
 ---
 
@@ -71,33 +85,50 @@ collect_reddit_data.py      ├─► preprocess_and_features.py ─► fca_anal
 
 ## Methods
 
-### 1. Formal Concept Analysis
+### 1. Data Collection & Preprocessing (`collect_*.py` → `preprocess_and_features.py`)
+- Daily LA traffic metrics (VMT, TTI, VHT, Delay) from Caltrans PeMS
+- Reddit posts scraped via PRAW from wildfire-related subreddits
+- VADER sentiment scoring; daily aggregation; binary feature engineering
+
+### 2. Formal Concept Analysis (`fca_analysis.py`)
 - Binary matrix: 33 days × 19 features
 - **`concepts`** library builds the Galois lattice
 - Association rules extracted with: `min_support=0.10`, `min_confidence=0.80`, `min_lift=1.05`, `max_premise_size=2`, `max_conclusion_prevalence=0.75`
 - Tautological rules filtered via `TAUTOLOGY_DEFINITIONS` (rules whose conclusions follow definitionally from composite feature premises)
 
-### 2. LLM Batch Evaluation
-- All 47 rules sent to `gpt-4o-mini` in a single call
-- System prompt instructs the LLM to select the top 20 most:
-  - **Novel** (would surprise an emergency manager)
-  - **Cross-domain** (mobility ↔ emotion)
-  - **Policy-actionable**
+### 3. LLM Batch Evaluation (`evaluate_rules_llm.py`)
+- Stratified candidate pool sent to `gpt-4o-mini` in a single call
+- System prompt includes:
+  - LA wildfire 4-phase crisis timeline
+  - Anchored novelty rubric (1–10 with LA-specific examples)
+  - Policy relevance rubric requiring LA agency names (LAFD, CAL FIRE, LA County OES)
 - LLM returns `novelty_score`, `policy_score`, `reasoning`, `policy_recommendation` for each selected rule
+
+### 4. Visualizations (`visualize_results.py`)
+Six charts with crisis phase shading, event lines (Jan 7 / Jan 12 / Jan 30), and 3-day rolling averages:
+
+| Chart | File |
+|-------|------|
+| Mobility trends (VMT / TTI / VHT / Delay) | `mobility_trends.png` |
+| Reddit sentiment timeline | `sentiment_timeline.png` |
+| Binary feature activation heatmap | `features_heatmap.png` |
+| Combined mobility + sentiment + signals | `combined_analysis.png` |
+| FCA rules: support vs confidence bubble chart | `rules_overview.png` |
+| Feature activation rates by domain | `feature_activation.png` |
 
 ---
 
 ## Key Findings
 
-| Rule | Support | Confidence | Lift | Novelty | Policy |
-|------|---------|-----------|------|---------|--------|
-| `traffic_congestion + anger → fear_keywords` | 5 days | 100% | 2.54 | 8/10 | 7/10 |
-| `traffic_congestion + sadness → policy_governance_discussion` | 6 days | 83% | 1.72 | 7/10 | 8/10 |
-| `traffic_congestion + anger → policy_governance_discussion` | 5 days | 80% | 1.65 | 7/10 | 8/10 |
-| `fear + anger → traffic_congestion` | 5 days | 100% | 2.30 | 6/10 | 6/10 |
-| `anger + policy_governance → traffic_congestion` | 5 days | 100% | 2.30 | 6/10 | 6/10 |
+| Rule | Support | Confidence | Lift |
+|------|---------|-----------|------|
+| `traffic_congestion + anger → fear_keywords` | 5 days | 100% | 2.54 |
+| `traffic_congestion + sadness → policy_governance_discussion` | 6 days | 83% | 1.72 |
+| `traffic_congestion + anger → policy_governance_discussion` | 5 days | 80% | 1.65 |
+| `fear + anger → traffic_congestion` | 5 days | 100% | 2.30 |
+| `anger + policy_governance → traffic_congestion` | 5 days | 100% | 2.30 |
 
-> Cross-domain rules reveal that traffic congestion co-occurs with escalating emotional distress (anger → fear, sadness → policy demands), suggesting mobility stress as an early-warning signal for community sentiment deterioration.
+> Cross-domain rules reveal that traffic congestion co-occurs with escalating emotional distress (anger → fear, sadness → policy demands), suggesting that Reddit emotion signals can serve as early-warning indicators for physical mobility disruption during wildfire crises.
 
 ---
 
@@ -118,6 +149,66 @@ cp .env.example .env
 # Edit .env — add your Reddit API credentials and OpenAI key:
 #   REDDIT_CLIENT_ID=...
 #   REDDIT_CLIENT_SECRET=...
+#   REDDIT_USER_AGENT=...
+#   OPENAI_API_KEY=sk-...
+```
+
+### 3. Run full pipeline
+```bash
+# Data collection (optional — raw data already in data/raw/)
+python scripts/collect_mobility_data.py
+python scripts/collect_reddit_data.py
+
+# Feature engineering
+python scripts/preprocess_and_features.py
+
+# FCA + association rules
+python scripts/fca_analysis.py
+
+# LLM evaluation (requires OPENAI_API_KEY)
+python scripts/evaluate_rules_llm.py --llm
+
+# Visualizations + summary report
+python scripts/visualize_results.py
+```
+
+Or run everything at once:
+```bash
+make all
+```
+
+---
+
+## Project Structure
+
+```
+capstone-project/
+├── data/
+│   ├── raw/                        # LA mobility CSV + Reddit JSON
+│   └── processed/                  # FCA binary matrix, features CSV
+├── results/
+│   ├── fca/
+│   │   ├── association_rules.csv           # All mined rules
+│   │   ├── association_rules_evaluated.csv # Rules with LLM scores
+│   │   ├── top_cross_domain_rules.txt      # Human-readable top rules
+│   │   ├── formal_concepts.csv
+│   │   └── crisis_context.cxt
+│   ├── visualizations/             # 6 chart PNGs (phase-shaded, rolling avg)
+│   └── summary_report.txt          # Auto-generated analysis summary
+├── scripts/
+│   ├── collect_mobility_data.py
+│   ├── collect_reddit_data.py
+│   ├── preprocess_and_features.py
+│   ├── fca_analysis.py             # Core FCA + tautology filtering
+│   ├── evaluate_rules_llm.py       # LLM batch evaluation
+│   └── visualize_results.py        # 6 charts + summary report
+├── requirements.txt
+└── README.md
+```
+
+---
+
+## Requirements
 #   REDDIT_USER_AGENT=...
 #   OPENAI_API_KEY=sk-...
 ```
