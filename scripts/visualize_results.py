@@ -581,10 +581,10 @@ class ResultsVisualizer:
                         if pd.notna(policy):
                             f.write(f"  Policy relevance (LLM annotation): {int(policy)}/10\n")
                         reasoning = row.get("llm_reasoning", "")
-                        if reasoning and str(reasoning).strip():
+                        if reasoning and str(reasoning).strip() not in ("", "nan"):
                             f.write(f"  Insight: {reasoning}\n")
                         rec = row.get("llm_policy_recommendation", "")
-                        if rec and str(rec).strip():
+                        if rec and str(rec).strip() not in ("", "nan"):
                             f.write(f"  Recommendation: {rec}\n")
 
             f.write("\n" + "=" * 80 + "\n")
