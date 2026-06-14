@@ -54,17 +54,17 @@ def main():
     check_directories()
     print("  ✓ Directories OK")
     
-    # Ask about LLM evaluation
+    # Ask about LLM annotation
     print("\n" + "=" * 70)
-    print("LLM RULE EVALUATION (Optional)")
+    print("LLM RULE ANNOTATION (Optional)")
     print("=" * 70)
-    print("The pipeline can evaluate association rules using an LLM to score")
-    print("novelty and crisis-relevance. This requires:")
+    print("The pipeline can annotate validated association rules using an LLM for")
+    print("policy relevance. This requires:")
     print("  • OpenAI API key (set OPENAI_API_KEY in .env or environment)")
     print("  • openai Python package (pip install openai)")
-    print("\nWithout LLM, rules are still ranked by cross-domain priority.")
+    print("\nWithout LLM, rules are ordered by statistical strength.")
     
-    use_llm = input("\nEnable LLM evaluation? (y/n, default: n): ").strip().lower() == 'y'
+    use_llm = input("\nEnable LLM annotation? (y/n, default: n): ").strip().lower() == 'y'
     
     if use_llm:
         import os
@@ -81,7 +81,7 @@ def main():
             print("⚠️  WARNING: OPENAI_API_KEY not found. Proceeding without LLM.")
             use_llm = False
         else:
-            print("✓ OPENAI_API_KEY detected. LLM evaluation enabled.")
+            print("✓ OPENAI_API_KEY detected. LLM annotation enabled.")
     
     # Ask user what to run
     print("\n" + "=" * 70)
@@ -103,7 +103,7 @@ def main():
         run_step(3, "Feature Engineering", "preprocess_and_features.py")
         run_step(4, "Formal Concept Analysis", "fca_analysis.py")
         run_step(5, "Visualization", "visualize_results.py")
-        run_step(6, "Rule Evaluation & Ranking", "evaluate_rules_llm.py", extra_args=eval_llm_args)
+        run_step(6, "Rule Evaluation & Annotation", "evaluate_rules_llm.py", extra_args=eval_llm_args)
     
     elif choice == "2":
         # Skip collection
@@ -112,14 +112,14 @@ def main():
         run_step(3, "Feature Engineering", "preprocess_and_features.py")
         run_step(4, "Formal Concept Analysis", "fca_analysis.py")
         run_step(5, "Visualization", "visualize_results.py")
-        run_step(6, "Rule Evaluation & Ranking", "evaluate_rules_llm.py", extra_args=eval_llm_args)
+        run_step(6, "Rule Evaluation & Annotation", "evaluate_rules_llm.py", extra_args=eval_llm_args)
     
     elif choice == "3":
         # Only analysis
         print("\n⏭️  Skipping data collection and preprocessing...")
         run_step(4, "Formal Concept Analysis", "fca_analysis.py")
         run_step(5, "Visualization", "visualize_results.py")
-        run_step(6, "Rule Evaluation & Ranking", "evaluate_rules_llm.py", extra_args=eval_llm_args)
+        run_step(6, "Rule Evaluation & Annotation", "evaluate_rules_llm.py", extra_args=eval_llm_args)
     
     elif choice == "4":
         # Custom
@@ -129,7 +129,7 @@ def main():
         print("  3: Feature Engineering")
         print("  4: FCA Analysis")
         print("  5: Visualization")
-        print("  6: Rule Evaluation (with optional LLM)")
+        print("  6: Rule Annotation (with optional LLM)")
         
         steps = input("\nSteps: ").strip().split()
         
@@ -139,7 +139,7 @@ def main():
             '3': ("Feature Engineering", "preprocess_and_features.py", None),
             '4': ("Formal Concept Analysis", "fca_analysis.py", None),
             '5': ("Visualization", "visualize_results.py", None),
-            '6': ("Rule Evaluation & Ranking", "evaluate_rules_llm.py", eval_llm_args),
+            '6': ("Rule Evaluation & Annotation", "evaluate_rules_llm.py", eval_llm_args),
         }
         
         for i, step_id in enumerate(steps, start=1):
@@ -175,9 +175,9 @@ def main():
     print("\n  📄 results/summary_report.txt")
     
     if use_llm:
-        print("     (with LLM-scored novelty & crisis_relevance)")
+        print("      (with LLM policy annotation; validity from statistics)")
     else:
-        print("     (ranked by cross-domain priority, no LLM scoring)")
+        print("     (ordered by statistical strength; no LLM)")
     
     print("\n" + "=" * 70)
 
