@@ -276,3 +276,11 @@ capstone-project/
 - `praw` (Reddit scraping)
 - `vaderSentiment` (sentiment scoring)
 - `openai>=1.0.0` (LLM evaluation — requires `OPENAI_API_KEY`)
+- `pydot>=4.0.0` (enables Graphviz dot layout integration from NetworkX)
+- Graphviz system package (`dot` executable) for hierarchical FCA lattice rendering
+
+On macOS install Graphviz with:
+
+```bash
+brew install graphviz
+```

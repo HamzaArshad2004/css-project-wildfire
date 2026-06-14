@@ -36,21 +36,21 @@ def _add_phase_bands(ax, alpha: float = 0.22) -> None:
                    color=color, alpha=alpha, zorder=0)
 
 
-def _add_event_lines(ax) -> None:
+def _add_event_lines(ax, fontsize: float = 6.5) -> None:
     """Draw vertical lines for key crisis events."""
     for date_str, label, color in _CRISIS_EVENTS:
         d = pd.to_datetime(date_str)
         ax.axvline(d, color=color, linewidth=1.2, linestyle='--', alpha=0.7, zorder=1)
         ax.text(d, ax.get_ylim()[1] * 0.97, label,
-                rotation=90, fontsize=6.5, color=color, va='top', ha='right', alpha=0.85)
+                rotation=90, fontsize=fontsize, color=color, va='top', ha='right', alpha=0.85)
 
 
-def _date_locator(ax) -> None:
+def _date_locator(ax, labelsize: float = 12) -> None:
     """Weekly major ticks, daily minor ticks for a ~33-day range."""
     ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=0))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %d"))
     ax.xaxis.set_minor_locator(mdates.DayLocator())
-    ax.tick_params(axis='x', rotation=30, labelsize=8)
+    ax.tick_params(axis='x', rotation=30, labelsize=labelsize)
 
 # ========= CONFIG =========
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -130,7 +130,7 @@ class ResultsVisualizer:
         fig, axes = plt.subplots(2, 2, figsize=(16, 10))
         axes_flat = axes.flatten()
         fig.suptitle('LA Wildfire 2025 — Traffic Mobility Metrics (Jan–Feb 2025)',
-                     fontsize=14, fontweight='bold', y=1.01)
+                     fontsize=20, fontweight='bold', y=0.99)
 
         for ax_i, (metric, color, label) in enumerate(metrics[:4]):
             ax = axes_flat[ax_i]
@@ -142,13 +142,14 @@ class ResultsVisualizer:
                     color=color, linewidth=0.7, alpha=0.4, label='Daily')
             ax.plot(roll3.index, roll3.values,
                     color=color, linewidth=2.2, label='3-day avg')
-            _add_event_lines(ax)
+            _add_event_lines(ax, fontsize=9)
 
-            ax.set_title(label, fontsize=10, fontweight='bold')
-            ax.set_ylabel(label.split('(')[0].strip(), fontsize=9)
-            ax.legend(fontsize=8, loc='upper right')
+            ax.set_title(label, fontsize=15, fontweight='bold')
+            ax.set_ylabel(label.split('(')[0].strip(), fontsize=13)
+            ax.legend(fontsize=12, loc='upper right')
             ax.grid(True, alpha=0.25, axis='y')
-            _date_locator(ax)
+            ax.tick_params(axis='y', labelsize=12)
+            _date_locator(ax, labelsize=12)
 
         # Hide unused subplots
         for ax_i in range(len(metrics), 4):
@@ -156,13 +157,13 @@ class ResultsVisualizer:
 
         phase_patches = [mpatches.Patch(color=c, alpha=0.6, label=l)
                          for _, _, c, l in _PHASES]
+        plt.tight_layout(rect=[0, 0.03, 1, 0.97])
         fig.legend(handles=phase_patches, loc='lower center', ncol=4,
-                   fontsize=8, framealpha=0.9, bbox_to_anchor=(0.5, -0.03))
+                   fontsize=12, framealpha=0.9, bbox_to_anchor=(0.5, 0.0))
 
-        plt.tight_layout()
         output_file = OUTPUT_DIR / 'mobility_trends.png'
         output_file.parent.mkdir(parents=True, exist_ok=True)
-        plt.savefig(output_file, dpi=300, bbox_inches='tight')
+        plt.savefig(output_file, dpi=300)
         plt.close()
         print(f"  ✓ Saved to {output_file}")
 
@@ -178,7 +179,7 @@ class ResultsVisualizer:
 
         fig, axes = plt.subplots(2, 1, figsize=(14, 9), sharex=True)
         fig.suptitle('Reddit Sentiment During LA Wildfire Crisis (Jan–Feb 2025)',
-                     fontsize=13, fontweight='bold')
+                     fontsize=20, fontweight='bold')
 
         # Panel 1: Compound sentiment
         ax1 = axes[0]
@@ -195,12 +196,13 @@ class ResultsVisualizer:
         ax1.plot(roll3.index, roll3.values,
                  color='purple', linewidth=2.2, label='3-day avg')
         ax1.axhline(0, color='black', linewidth=0.9, linestyle='--', alpha=0.5)
-        _add_event_lines(ax1)
-        ax1.set_ylabel('Compound Score', fontsize=10)
+        _add_event_lines(ax1, fontsize=9)
+        ax1.set_ylabel('Compound Score', fontsize=14)
         ax1.set_ylim(-1.1, 1.1)
-        ax1.legend(fontsize=9, loc='lower right')
+        ax1.legend(fontsize=12, loc='lower right')
         ax1.grid(True, alpha=0.2, axis='y')
-        ax1.set_title('Compound Sentiment', fontsize=10)
+        ax1.set_title('Compound Sentiment', fontsize=16)
+        ax1.tick_params(axis='y', labelsize=12)
 
         # Panel 2: Positive vs Negative fractions
         ax2 = axes[1]
@@ -217,24 +219,25 @@ class ResultsVisualizer:
                      color='red', linewidth=0.5, alpha=0.3)
             ax2.plot(neg_r.index, neg_r.values,
                      color='red', linewidth=2, label='Negative (3-day avg)')
-        _add_event_lines(ax2)
-        ax2.set_ylabel('Fraction of Posts', fontsize=10)
-        ax2.legend(fontsize=9, loc='upper right')
+        _add_event_lines(ax2, fontsize=9)
+        ax2.set_ylabel('Fraction of Posts', fontsize=14)
+        ax2.legend(fontsize=12, loc='upper right')
         ax2.grid(True, alpha=0.2, axis='y')
-        ax2.set_title('Positive vs Negative Post Fraction', fontsize=10)
+        ax2.set_title('Positive vs Negative Post Fraction', fontsize=16)
+        ax2.tick_params(axis='y', labelsize=12)
 
-        _date_locator(ax2)
-        ax2.set_xlabel('Date', fontsize=10)
+        _date_locator(ax2, labelsize=12)
+        ax2.set_xlabel('Date', fontsize=14)
 
         phase_patches = [mpatches.Patch(color=c, alpha=0.6, label=l)
                          for _, _, c, l in _PHASES]
+        plt.tight_layout(rect=[0, 0.035, 1, 1])
         fig.legend(handles=phase_patches, loc='lower center', ncol=4,
-                   fontsize=8, framealpha=0.9, bbox_to_anchor=(0.5, -0.02))
+                   fontsize=12, framealpha=0.9, bbox_to_anchor=(0.5, 0.0))
 
-        plt.tight_layout()
         output_file = OUTPUT_DIR / 'sentiment_timeline.png'
         output_file.parent.mkdir(parents=True, exist_ok=True)
-        plt.savefig(output_file, dpi=300, bbox_inches='tight')
+        plt.savefig(output_file, dpi=300)
         plt.close()
         print(f"  ✓ Saved to {output_file}")
 
@@ -276,14 +279,14 @@ class ResultsVisualizer:
 
         # Y: feature names
         ax.set_yticks(range(len(ordered_cols)))
-        ax.set_yticklabels(ordered_cols, fontsize=8)
+        ax.set_yticklabels(ordered_cols, fontsize=12)
 
         # X: daily dates — show every 3rd
         dates = df_indexed.index.tolist()
         tick_pos = list(range(0, len(dates), 3))
         ax.set_xticks(tick_pos)
         ax.set_xticklabels([dates[i].strftime('%b %d') for i in tick_pos],
-                           rotation=35, fontsize=8)
+                           rotation=35, fontsize=11)
 
         # Phase boundary lines
         for start_str, _, _, _ in _PHASES[1:]:
@@ -293,11 +296,11 @@ class ResultsVisualizer:
             ax.axvline(closest_i - 0.5, color='white', linewidth=1.8, alpha=0.8)
 
         cbar = fig.colorbar(im, ax=ax, fraction=0.015, pad=0.01)
-        cbar.set_label('Feature active (1) / inactive (0)', fontsize=9)
+        cbar.set_label('Feature active (1) / inactive (0)', fontsize=12)
         ax.set_title('Feature Activation Heatmap — LA Wildfire 2025 (daily)',
-                     fontsize=13, fontweight='bold')
-        ax.set_xlabel('Date', fontsize=10)
-        ax.set_ylabel('Feature', fontsize=10)
+                     fontsize=16, fontweight='bold')
+        ax.set_xlabel('Date', fontsize=14)
+        ax.set_ylabel('Feature', fontsize=14)
 
         plt.tight_layout()
         output_file = OUTPUT_DIR / 'features_heatmap.png'
@@ -315,7 +318,7 @@ class ResultsVisualizer:
 
         fig, axes = plt.subplots(3, 1, figsize=(15, 11), sharex=True)
         fig.suptitle('LA Wildfire 2025 — Mobility, Sentiment & Key Signals',
-                     fontsize=13, fontweight='bold')
+                     fontsize=18, fontweight='bold')
 
         # Panel 1: VMT
         ax1 = axes[0]
@@ -326,11 +329,12 @@ class ResultsVisualizer:
             ax1.plot(vmt.index, vmt.values, color='#1f77b4', linewidth=0.6, alpha=0.35)
             ax1.plot(roll3.index, roll3.values, color='#1f77b4', linewidth=2.2,
                      label='VMT (3-day avg)')
-            _add_event_lines(ax1)
-        ax1.set_ylabel('Veh-Miles', fontsize=10)
-        ax1.legend(fontsize=9, loc='lower right')
+            _add_event_lines(ax1, fontsize=10)
+        ax1.set_ylabel('Veh-Miles', fontsize=14)
+        ax1.legend(fontsize=12, loc='lower right')
         ax1.grid(True, alpha=0.2, axis='y')
-        ax1.set_title('Vehicle Miles Traveled', fontsize=10)
+        ax1.set_title('Vehicle Miles Traveled', fontsize=15)
+        ax1.tick_params(axis='y', labelsize=12)
 
         # Panel 2: Compound sentiment
         ax2 = axes[1]
@@ -347,12 +351,13 @@ class ResultsVisualizer:
             ax2.plot(roll3.index, roll3.values, color='purple', linewidth=2.2,
                      label='Compound sentiment (3-day avg)')
             ax2.axhline(0, color='black', linewidth=0.8, linestyle='--', alpha=0.4)
-            _add_event_lines(ax2)
-        ax2.set_ylabel('Sentiment score', fontsize=10)
+            _add_event_lines(ax2, fontsize=10)
+        ax2.set_ylabel('Sentiment score', fontsize=14)
         ax2.set_ylim(-1.1, 1.1)
-        ax2.legend(fontsize=9, loc='lower right')
+        ax2.legend(fontsize=12, loc='lower right')
         ax2.grid(True, alpha=0.2, axis='y')
-        ax2.set_title('Reddit Compound Sentiment', fontsize=10)
+        ax2.set_title('Reddit Compound Sentiment', fontsize=15)
+        ax2.tick_params(axis='y', labelsize=12)
 
         # Panel 3: Binary signals
         ax3 = axes[2]
@@ -370,20 +375,20 @@ class ResultsVisualizer:
                             color=color, s=60, alpha=0.8, label=label, zorder=3)
         ax3.set_yticks(offsets)
         ax3.set_yticklabels(['Traffic\ncongestion', 'Evacuation\nmentioned', 'Solidarity\nmessages'],
-                            fontsize=8)
+                            fontsize=12)
         ax3.set_ylim(0, 1)
-        ax3.legend(fontsize=8, loc='lower right')
+        ax3.legend(fontsize=12, loc='lower right')
         ax3.grid(True, alpha=0.2, axis='y')
-        ax3.set_title('Key Binary Signals', fontsize=10)
-        _add_event_lines(ax3)
+        ax3.set_title('Key Binary Signals', fontsize=15)
+        _add_event_lines(ax3, fontsize=10)
 
-        _date_locator(ax3)
-        ax3.set_xlabel('Date', fontsize=10)
+        _date_locator(ax3, labelsize=12)
+        ax3.set_xlabel('Date', fontsize=14)
 
         phase_patches = [mpatches.Patch(color=c, alpha=0.6, label=l)
                          for _, _, c, l in _PHASES]
         fig.legend(handles=phase_patches, loc='lower center', ncol=4,
-                   fontsize=8, framealpha=0.9, bbox_to_anchor=(0.5, -0.02))
+                   fontsize=12, framealpha=0.9, bbox_to_anchor=(0.5, -0.02))
 
         plt.tight_layout()
         output_file = OUTPUT_DIR / 'combined_analysis.png'
@@ -426,15 +431,16 @@ class ResultsVisualizer:
             x = row.get('support_pct', row['support'] * 100)
             premise_short = str(row['premise'])[:35] + ('…' if len(str(row['premise'])) > 35 else '')
             ax.annotate(premise_short, (x, row['confidence']),
-                        fontsize=6.5, ha='left', va='bottom',
+                        fontsize=9, ha='left', va='bottom',
                         xytext=(4, 3), textcoords='offset points', color='#333')
 
-        ax.set_xlabel('Support (%)', fontsize=11)
-        ax.set_ylabel('Confidence (%)', fontsize=11)
+        ax.set_xlabel('Support (%)', fontsize=14)
+        ax.set_ylabel('Confidence (%)', fontsize=14)
         ax.set_title('FCA Association Rules — Support vs Confidence\n(bubble size = lift²)',
-                     fontsize=12, fontweight='bold')
-        ax.legend(fontsize=10)
+                     fontsize=16, fontweight='bold')
+        ax.legend(fontsize=12)
         ax.grid(True, alpha=0.25)
+        ax.tick_params(labelsize=12)
 
         plt.tight_layout()
         output_file = OUTPUT_DIR / 'rules_overview.png'
@@ -477,14 +483,15 @@ class ResultsVisualizer:
         bars = ax.barh(rates.index, rates.values, color=colors, alpha=0.82, edgecolor='white')
         for bar, val in zip(bars, rates.values):
             ax.text(val + 0.5, bar.get_y() + bar.get_height() / 2,
-                    f'{val:.0f}%', va='center', fontsize=8)
+                    f'{val:.0f}%', va='center', fontsize=12)
 
-        ax.set_xlabel('% of days active', fontsize=10)
+        ax.set_xlabel('% of days active', fontsize=14)
         ax.set_title('Feature Activation Rates — LA Wildfire 2025 (33 days)',
-                     fontsize=12, fontweight='bold')
+                     fontsize=16, fontweight='bold')
         ax.set_xlim(0, 108)
         ax.grid(True, alpha=0.2, axis='x')
         ax.axvline(50, color='black', linewidth=0.8, linestyle='--', alpha=0.4)
+        ax.tick_params(labelsize=12)
 
         legend_patches = [
             mpatches.Patch(color='#1f77b4', label='Mobility'),
@@ -492,7 +499,7 @@ class ResultsVisualizer:
             mpatches.Patch(color='#2ca02c', label='Topic/Discourse'),
             mpatches.Patch(color='#9467bd', label='Composite'),
         ]
-        ax.legend(handles=legend_patches, fontsize=9, loc='lower right')
+        ax.legend(handles=legend_patches, fontsize=12, loc='lower right')
 
         plt.tight_layout()
         output_file = OUTPUT_DIR / 'feature_activation.png'

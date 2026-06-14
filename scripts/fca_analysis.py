@@ -171,11 +171,23 @@ class FCAAnalyzer:
             min_confidence: Minimum rule confidence (0.0 to 1.0)
             min_lift: Minimum rule lift (>1 means positive association)
             max_conclusion_prevalence: Ignore overly common conclusions
+
+        Prints a short filtering summary so the rule funnel is reportable:
+            candidate (premise, conclusion) pairs evaluated,
+            rules passing the statistical thresholds (support/conf/lift),
+            rules removed by the tautology filter, and the final count.
+        Note: because the statistical gates are applied inline during mining,
+        "rules passing thresholds" is the earliest countable stage — there is
+        no separate ungated raw-rule list.
         """
         if self.context is None:
             self.create_formal_context()
 
         implications = []
+        # --- Rule-funnel counters (for reporting / cross-case table) ---
+        candidate_pairs = 0      # (premise, conclusion) pairs that cleared support + prevalence
+        passed_thresholds = 0    # of those, how many cleared confidence + lift
+        tautology_removed = 0    # of those, how many the tautology filter dropped
         min_support_count = max(2, math.ceil(min_support * len(self.binary_data)))
 
         feature_names = list(self.binary_data.columns)
@@ -201,6 +213,8 @@ class FCAAnalyzer:
                     if p_conclusion == 0 or p_conclusion > max_conclusion_prevalence:
                         continue
 
+                    candidate_pairs += 1
+
                     conclusion_support = int(self.binary_data.loc[premise_mask, conclusion].sum())
                     confidence = conclusion_support / support_count
                     lift = confidence / p_conclusion
@@ -209,7 +223,9 @@ class FCAAnalyzer:
                     )
 
                     if confidence >= min_confidence and lift >= min_lift:
+                        passed_thresholds += 1
                         if _is_tautological(premise_tuple, conclusion):
+                            tautology_removed += 1
                             continue
                         implications.append({
                             'premise': ', '.join(premise_tuple),
@@ -221,6 +237,13 @@ class FCAAnalyzer:
                             'leverage': leverage,
                             'cross_domain': _is_cross_domain(premise_tuple, conclusion),
                         })
+
+        # --- Filtering summary -------------------------------------------------
+        print("\n  Rule extraction summary:")
+        print(f"    Candidate (premise -> conclusion) pairs evaluated : {candidate_pairs}")
+        print(f"    Passed thresholds (support/conf/lift)             : {passed_thresholds}")
+        print(f"    Removed by tautology filter                       : {tautology_removed}")
+        print(f"    Final rules retained                              : {len(implications)}")
 
         return pd.DataFrame(implications)
 
@@ -331,6 +354,7 @@ if __name__ == "__main__":
             ascending=[False, False, False, False],
         )
     rules_df.to_csv(RESULTS_DIR / 'association_rules.csv', index=False)
+    print(f"\nTotal rules saved: {len(rules_df)}")
     print("\nTop 10 Association Rules:")
     print(rules_df.head(10))
 
