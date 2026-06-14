@@ -94,7 +94,9 @@ mobility_data.py   reddit_data.py ──┘     and_features.py     analysis.py
 - Binary matrix: 33 days × 19 features
 - **`concepts`** library builds the Galois lattice
 - Association rules extracted with: `min_support=0.10`, `min_confidence=0.80`, `min_lift=1.05`, `max_premise_size=2`, `max_conclusion_prevalence=0.75`
-- Tautological rules filtered via `TAUTOLOGY_DEFINITIONS` (rules whose conclusions follow definitionally from composite feature premises)
+- Tautological rules filtered via `TAUTOLOGY_DEFINITIONS` (rules whose conclusions follow definitionally from composite feature premises). In the latest run, 63 rules cleared the statistical thresholds and 16 were removed by the tautology filter, leaving 47 final rules.
+
+> **Same-day only.** This wildfire case mines same-day rules exclusively — there are no lag/lead (predictive) features and no temporal-direction, persistence, or backtest stages. With a 33-day window, rules are filtered by the statistical thresholds and the inline tautology check alone.
 
 ### 3. LLM Batch Evaluation (`evaluate_rules_llm.py`)
 - Stratified candidate pool sent to `gpt-4o-mini` in a single call
@@ -120,15 +122,17 @@ Six charts with crisis phase shading, event lines (Jan 7 / Jan 12 / Jan 30), and
 
 ## Key Findings
 
+Top cross-domain rules (mobility × emotion/discourse):
+
 | Rule | Support | Confidence | Lift |
 |------|---------|-----------|------|
 | `traffic_congestion + anger → fear_keywords` | 5 days | 100% | 2.54 |
 | `traffic_congestion + sadness → policy_governance_discussion` | 6 days | 83% | 1.72 |
 | `traffic_congestion + anger → policy_governance_discussion` | 5 days | 80% | 1.65 |
-| `fear + anger → traffic_congestion` | 5 days | 100% | 2.30 |
-| `anger + policy_governance → traffic_congestion` | 5 days | 100% | 2.30 |
+| `fear + anger → traffic_congestion` | 6 days | 83% | 1.96 |
+| `anger + policy_governance → traffic_congestion` | 5 days | 80% | 1.89 |
 
-> Cross-domain rules reveal that traffic congestion co-occurs with escalating emotional distress (anger → fear, sadness → policy demands), suggesting that Reddit emotion signals can serve as early-warning indicators for physical mobility disruption during wildfire crises.
+> Cross-domain rules reveal that traffic congestion co-occurs with escalating emotional distress (anger → fear, sadness → policy demands), and that a fear–anger climate co-occurs with traffic congestion at above-chance rates. This suggests Reddit emotion signals can serve as early-warning indicators for physical mobility disruption during wildfire crises.
 
 ---
 
@@ -192,7 +196,7 @@ capstone-project/
 │   │   ├── association_rules_evaluated.csv # Rules with LLM scores
 │   │   ├── top_cross_domain_rules.txt      # Human-readable top rules
 │   │   ├── formal_concepts.csv
-│   │   └── crisis_context.cxt
+│   │   └── crisis_context.cxt              # Galicia-compatible FCA context
 │   ├── visualizations/             # 6 chart PNGs (phase-shaded, rolling avg)
 │   └── summary_report.txt          # Auto-generated analysis summary
 ├── scripts/
@@ -209,66 +213,6 @@ capstone-project/
 ---
 
 ## Requirements
-#   REDDIT_USER_AGENT=...
-#   OPENAI_API_KEY=sk-...
-```
-
-### 3. Run full pipeline
-```bash
-# Data collection (optional — raw data already in data/raw/)
-python scripts/collect_mobility_data.py
-python scripts/collect_reddit_data.py
-
-# Feature engineering
-python scripts/preprocess_and_features.py
-
-# FCA + association rules
-python scripts/fca_analysis.py
-
-# LLM evaluation (requires OPENAI_API_KEY)
-python scripts/evaluate_rules_llm.py --llm
-
-# Visualizations + summary report
-python scripts/visualize_results.py
-```
-
-Or run everything at once:
-```bash
-make all
-```
-
----
-
-## Project Structure
-
-```
-capstone-project/
-├── data/
-│   ├── raw/                        # LA mobility CSV + Reddit JSON
-│   └── processed/                  # FCA binary matrix, features CSV
-├── results/
-│   ├── fca/
-│   │   ├── association_rules.csv           # All mined rules
-│   │   ├── association_rules_evaluated.csv # Rules with LLM scores
-│   │   ├── top_cross_domain_rules.txt      # Human-readable top rules
-│   │   ├── formal_concepts.csv
-│   │   └── galois_lattice.png
-│   ├── visualizations/             # Mobility, sentiment, heatmap plots
-│   └── summary_report.txt          # Auto-generated analysis summary
-├── scripts/
-│   ├── collect_mobility_data.py
-│   ├── collect_reddit_data.py
-│   ├── preprocess_and_features.py
-│   ├── fca_analysis.py             # Core FCA + tautology filtering
-│   ├── evaluate_rules_llm.py       # LLM batch evaluation
-│   └── visualize_results.py
-├── requirements.txt
-└── README.md
-```
-
----
-
-## Requirements
 
 - Python 3.10+
 - `pandas`, `numpy`, `matplotlib`, `seaborn`
@@ -276,11 +220,3 @@ capstone-project/
 - `praw` (Reddit scraping)
 - `vaderSentiment` (sentiment scoring)
 - `openai>=1.0.0` (LLM evaluation — requires `OPENAI_API_KEY`)
-- `pydot>=4.0.0` (enables Graphviz dot layout integration from NetworkX)
-- Graphviz system package (`dot` executable) for hierarchical FCA lattice rendering
-
-On macOS install Graphviz with:
-
-```bash
-brew install graphviz
-```
