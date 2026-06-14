@@ -32,7 +32,8 @@ FEATURE ACTIVATION SUMMARY:
   weekend                                        27.3%
 
 
-TOP 20 LLM-SELECTED ASSOCIATION RULES:
+ASSOCIATION RULES (statistically ordered: cross-domain, lift, confidence) — 47 total:
+(LLM provides policy annotation only; it does not rank or select rules.)
 --------------------------------------------------------------------------------
 
 Rule 1: [CROSS-DOMAIN]
@@ -41,178 +42,438 @@ Rule 1: [CROSS-DOMAIN]
   Support: 5 days (15.2%)
   Confidence: 100.0%
   Lift: 2.54
-  LLM: novelty=8/10  policy_relevance=7/10
-  Why it matters: The finding that traffic congestion can lead to increased fear keywords is surprising, as one might expect fear to lead to congestion due to evacuations.
-  Policy recommendation: Emergency managers should monitor traffic congestion closely as a potential indicator of rising fear levels, prompting timely communication and support.
+  Policy relevance (LLM annotation): 9/10
+  Insight: During the Ignition & rapid spread phase, traffic congestion and anger mentioned on Reddit predict fear keywords. This counter-intuitive direction suggests that increased traffic stress may amplify fear responses among residents.
+  Recommendation: LA County OES should monitor traffic congestion and anger mentions on social media, triggering immediate community outreach to address fears and provide updates.
 
 Rule 2: [CROSS-DOMAIN]
-  IF:   traffic_congestion_detected, sadness_keywords_present
-  THEN: policy_governance_discussion
-  Support: 6 days (18.2%)
-  Confidence: 83.3%
-  Lift: 1.72
-  LLM: novelty=7/10  policy_relevance=8/10
-  Why it matters: The association between traffic congestion and discussions on policy governance suggests that logistical issues may prompt community governance discussions, which is unexpected.
-  Policy recommendation: Encourage local governance bodies to proactively engage with communities during high congestion periods to address concerns and provide clear guidance.
-
-Rule 3: [CROSS-DOMAIN]
-  IF:   traffic_congestion_detected, anger_mentioned
-  THEN: policy_governance_discussion
-  Support: 5 days (15.2%)
-  Confidence: 80.0%
-  Lift: 1.65
-  LLM: novelty=7/10  policy_relevance=8/10
-  Why it matters: Traffic congestion leading to policy governance discussions indicates that logistical challenges can drive community engagement in governance, which is not commonly recognized.
-  Policy recommendation: Facilitate platforms for community discussions during crises to address policy concerns arising from mobility issues.
-
-Rule 4: [CROSS-DOMAIN]
-  IF:   fear_keywords_present, anger_mentioned
-  THEN: traffic_congestion_detected
-  Support: 6 days (18.2%)
-  Confidence: 83.3%
-  Lift: 1.96
-  LLM: novelty=6/10  policy_relevance=7/10
-  Why it matters: Fear and anger leading to traffic congestion suggests a complex emotional response influencing physical behavior, which is not a typical assumption.
-  Policy recommendation: Implement emotional support services during crises to mitigate fear and anger, potentially reducing congestion.
-
-Rule 5: [CROSS-DOMAIN]
-  IF:   anger_mentioned, policy_governance_discussion
-  THEN: traffic_congestion_detected
-  Support: 5 days (15.2%)
-  Confidence: 80.0%
-  Lift: 1.89
-  LLM: novelty=6/10  policy_relevance=7/10
-  Why it matters: The link between policy governance discussions and traffic congestion indicates that community concerns can manifest in physical mobility patterns, which is unexpected.
-  Policy recommendation: Enhance communication strategies to address community concerns about policy during high congestion periods.
-
-Rule 6: [CROSS-DOMAIN]
   IF:   traffic_congestion_detected, emotion_with_mobility_signal
   THEN: fear_keywords_present
   Support: 9 days (27.3%)
   Confidence: 88.9%
   Lift: 2.26
-  LLM: novelty=6/10  policy_relevance=6/10
-  Why it matters: The connection between traffic congestion and fear keywords through an emotional mobility signal highlights an unexpected emotional response to physical conditions.
-  Policy recommendation: Monitor emotional signals in conjunction with mobility data to better understand community sentiment and respond effectively.
+  Policy relevance (LLM annotation): 8/10
+  Insight: In the Peak crisis phase, traffic congestion combined with any emotion signals predicts fear keywords. This surprising association indicates that physical disruptions can heighten emotional responses, which may not be immediately obvious.
+  Recommendation: LAPD should track traffic congestion alongside emotional signals on social media to better anticipate and manage public anxiety during crises.
+
+Rule 3: [CROSS-DOMAIN]
+  IF:   fear_keywords_present, anger_mentioned
+  THEN: traffic_congestion_detected
+  Support: 6 days (18.2%)
+  Confidence: 83.3%
+  Lift: 1.96
+  Policy relevance (LLM annotation): 6/10
+  Insight: During the Peak crisis phase, fear keywords and anger mentioned predict traffic congestion. This suggests that emotional distress can lead to increased mobility stress, which is not a typical assumption.
+  Recommendation: LA County OES should track fear and anger signals to anticipate traffic patterns and prepare for potential evacuation needs.
+
+Rule 4: [CROSS-DOMAIN]
+  IF:   anger_mentioned, policy_governance_discussion
+  THEN: traffic_congestion_detected
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 1.89
+  Policy relevance (LLM annotation): 6/10
+  Insight: In the Peak crisis phase, anger and policy governance discussions lead to traffic congestion. This indicates that public discourse can influence mobility patterns, which is an unexpected insight.
+  Recommendation: LAPD should monitor public discussions around policy to better understand and manage traffic implications during crises.
+
+Rule 5: [CROSS-DOMAIN]
+  IF:   traffic_congestion_detected, sadness_keywords_present
+  THEN: policy_governance_discussion
+  Support: 6 days (18.2%)
+  Confidence: 83.3%
+  Lift: 1.72
+  Policy relevance (LLM annotation): 7/10
+  Insight: During the Peak crisis phase, traffic congestion and sadness keywords lead to discussions about policy governance. This suggests that emotional distress can drive civic engagement and policy discourse.
+  Recommendation: LA DPW should monitor traffic congestion and sadness discussions to identify opportunities for community engagement and policy discussions that address public concerns.
+
+Rule 6: [CROSS-DOMAIN]
+  IF:   traffic_congestion_detected, anger_mentioned
+  THEN: policy_governance_discussion
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 1.65
+  Policy relevance (LLM annotation): 7/10
+  Insight: In the Peak crisis phase, traffic congestion and anger lead to policy governance discussions. This indicates that heightened emotions can prompt residents to seek clarity and action from authorities.
+  Recommendation: CAL FIRE should monitor traffic congestion and anger mentions to proactively engage with the community and provide timely updates on fire management efforts.
 
 Rule 7:
-  IF:   fear_keywords_present, mixed_emotions
-  THEN: sadness_keywords_present
-  Support: 4 days (12.1%)
-  Confidence: 100.0%
-  Lift: 3.00
-  LLM: novelty=5/10  policy_relevance=6/10
-  Why it matters: The finding that mixed emotions and fear keywords can lead to sadness keywords suggests a complex emotional landscape that influences community sentiment.
-  Policy recommendation: Develop targeted mental health resources that address mixed emotions during crises to support community resilience.
-
-Rule 8:
   IF:   anger_mentioned, sadness_keywords_present
   THEN: mixed_emotions
   Support: 4 days (12.1%)
   Confidence: 100.0%
   Lift: 6.60
-  LLM: novelty=5/10  policy_relevance=5/10
-  Why it matters: Anger and sadness leading to mixed emotions indicates that emotional responses can complicate community dynamics in crises, which is not commonly acknowledged.
-  Policy recommendation: Provide emotional support resources to help individuals navigate complex feelings during crises, potentially improving community cohesion.
+  Policy relevance (LLM annotation): 5/10
+  Insight: In the Peak crisis phase, anger and sadness keywords lead to mixed emotions. This suggests that emotional complexity can arise during crises, which is important for understanding community sentiment.
+  Recommendation: LA County OES should monitor emotional complexity to tailor communication strategies that resonate with the community.
+
+Rule 8:
+  IF:   anger_mentioned, solidarity_messages
+  THEN: mixed_emotions
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 5.28
+  Policy relevance (LLM annotation): 5/10
+  Insight: During the Peak crisis phase, anger mentioned and solidarity messages lead to mixed emotions. This indicates that community solidarity can coexist with negative emotions, which is a nuanced insight.
+  Recommendation: LA DPW should leverage solidarity messaging to address mixed emotions and foster community resilience during crises.
 
 Rule 9:
+  IF:   mixed_emotions, solidarity_messages
+  THEN: anger_mentioned
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 4.71
+  Insight: nan
+  Recommendation: nan
+
+Rule 10:
+  IF:   mixed_emotions
+  THEN: anger_mentioned
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 3.77
+  Insight: nan
+  Recommendation: nan
+
+Rule 11:
   IF:   high_negative_sentiment, sentiment_shift_detected
   THEN: sentiment_worsened
   Support: 5 days (15.2%)
   Confidence: 80.0%
   Lift: 3.77
-  LLM: novelty=5/10  policy_relevance=5/10
-  Why it matters: High negative sentiment leading to sentiment worsening through a shift detected suggests a feedback loop that could escalate community distress.
-  Policy recommendation: Implement real-time sentiment analysis to identify and address negative trends before they escalate into broader community issues.
+  Policy relevance (LLM annotation): 5/10
+  Insight: In the Peak crisis phase, high negative sentiment and sentiment shift detected lead to sentiment worsening. This expected co-occurrence highlights the need for monitoring emotional trends.
+  Recommendation: LA County OES should track negative sentiment trends to anticipate community needs and adjust communication strategies.
 
-Rule 10:
+Rule 12:
   IF:   sentiment_shift_detected, fear_keywords_present
   THEN: sentiment_worsened
   Support: 5 days (15.2%)
   Confidence: 80.0%
   Lift: 3.77
-  LLM: novelty=5/10  policy_relevance=5/10
-  Why it matters: The relationship between sentiment shift and fear keywords indicates that emotional responses can significantly impact community sentiment, which is often overlooked.
-  Policy recommendation: Utilize sentiment analysis to inform communication strategies, ensuring messages resonate with community emotions during crises.
+  Policy relevance (LLM annotation): 5/10
+  Insight: During the Peak crisis phase, sentiment shift detected and fear keywords present lead to sentiment worsening. This suggests that fear can exacerbate negative sentiment, which is critical for understanding community dynamics.
+  Recommendation: LAPD should monitor fear signals to anticipate shifts in community sentiment and respond proactively.
 
-Rule 11:
+Rule 13:
   IF:   sadness_keywords_present, mixed_emotions
   THEN: anger_mentioned
   Support: 5 days (15.2%)
   Confidence: 80.0%
   Lift: 3.77
-  LLM: novelty=4/10  policy_relevance=5/10
-  Why it matters: Sadness and mixed emotions leading to anger suggests that emotional responses can escalate, which is a surprising insight into community dynamics.
-  Policy recommendation: Create community engagement initiatives that address sadness and promote positive emotional expression to prevent escalation.
+  Policy relevance (LLM annotation): 5/10
+  Insight: In the Peak crisis phase, sadness keywords and mixed emotions lead to anger mentioned. This indicates that emotional complexity can lead to increased anger, which is important for crisis management.
+  Recommendation: LA County OES should monitor emotional complexity to better address community concerns and mitigate anger.
 
-Rule 12:
-  IF:   sentiment_shift_detected, emotion_mobility_mismatch
-  THEN: high_negative_sentiment
-  Support: 4 days (12.1%)
-  Confidence: 100.0%
-  Lift: 3.00
-  LLM: novelty=4/10  policy_relevance=5/10
-  Why it matters: Sentiment shift detected leading to high negative sentiment indicates a potential for emotional crises that could affect community stability.
-  Policy recommendation: Establish early warning systems based on sentiment analysis to proactively address emerging emotional crises.
+Rule 14:
+  IF:   policy_governance_discussion, emotion_with_mobility_signal
+  THEN: anger_mentioned
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 3.77
+  Policy relevance (LLM annotation): 5/10
+  Insight: During the Peak crisis phase, policy governance discussions and emotion with mobility signals lead to anger mentioned. This suggests that governance discussions can provoke strong emotional responses.
+  Recommendation: LA DPW should track governance discussions to anticipate emotional responses and prepare appropriate communication strategies.
 
-Rule 13:
+Rule 15:
   IF:   high_negative_sentiment, weekend
   THEN: emotion_mobility_mismatch
   Support: 4 days (12.1%)
   Confidence: 100.0%
   Lift: 3.67
-  LLM: novelty=4/10  policy_relevance=4/10
-  Why it matters: High negative sentiment on weekends leading to emotion mobility mismatch suggests that emotional responses can vary significantly by day, which is unexpected.
-  Policy recommendation: Tailor community support services to address emotional needs specifically during weekends when sentiment may shift.
+  Insight: nan
+  Recommendation: nan
 
-Rule 14:
-  IF:   weekend, emotion_mobility_mismatch
+Rule 16:
+  IF:   policy_governance_discussion, emotion_mobility_mismatch
+  THEN: weekend
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 3.67
+  Insight: nan
+  Recommendation: nan
+
+Rule 17:
+  IF:   fear_keywords_present, anger_mentioned
+  THEN: emotion_with_mobility_signal
+  Support: 6 days (18.2%)
+  Confidence: 83.3%
+  Lift: 3.06
+  Policy relevance (LLM annotation): 6/10
+  Insight: During the Peak crisis phase, fear keywords and anger mentioned predict an emotion with mobility signal. This unexpected association highlights how emotional responses can influence mobility behaviors.
+  Recommendation: LA County OES should monitor fear and anger signals to anticipate changes in mobility and prepare appropriate responses.
+
+Rule 18:
+  IF:   mixed_emotions
+  THEN: sadness_keywords_present
+  Support: 5 days (15.2%)
+  Confidence: 100.0%
+  Lift: 3.00
+  Insight: nan
+  Recommendation: nan
+
+Rule 19:
+  IF:   sentiment_shift_detected, emotion_mobility_mismatch
   THEN: high_negative_sentiment
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 3.00
+  Policy relevance (LLM annotation): 5/10
+  Insight: In the Peak crisis phase, sentiment shift detected and emotion mobility mismatch lead to high negative sentiment. This indicates that mismatches between emotions and mobility can exacerbate negative feelings.
+  Recommendation: LA County OES should monitor emotional mobility mismatches to better understand community sentiment and adjust responses.
+
+Rule 20:
+  IF:   fear_keywords_present, mixed_emotions
+  THEN: sadness_keywords_present
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 3.00
+  Policy relevance (LLM annotation): 5/10
+  Insight: During the Peak crisis phase, fear keywords and mixed emotions lead to sadness keywords. This suggests that fear can contribute to feelings of sadness, which is important for understanding emotional dynamics.
+  Recommendation: LAPD should monitor fear and mixed emotions to better address community sentiment and provide support.
+
+Rule 21:
+  IF:   anger_mentioned, mixed_emotions
+  THEN: sadness_keywords_present
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 3.00
+  Insight: nan
+  Recommendation: nan
+
+Rule 22:
+  IF:   mixed_emotions, solidarity_messages
+  THEN: sadness_keywords_present
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 3.00
+  Insight: nan
+  Recommendation: nan
+
+Rule 23:
+  IF:   high_negative_sentiment, sentiment_shift_detected
+  THEN: emotion_mobility_mismatch
   Support: 5 days (15.2%)
   Confidence: 80.0%
-  Lift: 2.40
-  LLM: novelty=4/10  policy_relevance=4/10
-  Why it matters: Weekend emotion mobility mismatch leading to high negative sentiment indicates that emotional responses can vary significantly by day, which is unexpected.
-  Policy recommendation: Monitor emotional trends over weekends to better allocate resources for community support during these times.
+  Lift: 2.93
+  Insight: nan
+  Recommendation: nan
 
-Rule 15:
+Rule 24:
+  IF:   anger_mentioned, policy_governance_discussion
+  THEN: emotion_with_mobility_signal
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 2.93
+  Insight: nan
+  Recommendation: nan
+
+Rule 25:
+  IF:   policy_governance_discussion, weekend
+  THEN: emotion_mobility_mismatch
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 2.93
+  Insight: nan
+  Recommendation: nan
+
+Rule 26:
+  IF:   dominant_emotion_fear
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)
+  Confidence: 100.0%
+  Lift: 2.54
+  Insight: nan
+  Recommendation: nan
+
+Rule 27:
+  IF:   anger_mentioned, emotion_with_mobility_signal
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)
+  Confidence: 100.0%
+  Lift: 2.54
+  Policy relevance (LLM annotation): 5/10
+  Insight: During the Peak crisis phase, anger mentioned and emotion with mobility signals predict fear keywords. This indicates that emotional responses can be linked to physical mobility signals.
+  Recommendation: LAPD should track anger mentions alongside mobility signals to better understand community sentiment and prepare for potential unrest.
+
+Rule 28:
+  IF:   policy_governance_discussion, emotion_with_mobility_signal
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)
+  Confidence: 100.0%
+  Lift: 2.54
+  Policy relevance (LLM annotation): 6/10
+  Insight: In the Peak crisis phase, policy governance discussions and emotion with mobility signals lead to fear keywords. This suggests that discussions about governance can amplify emotional responses.
+  Recommendation: LA DPW should monitor policy discussions alongside emotional signals to better address community concerns and fears.
+
+Rule 29:
+  IF:   sadness_keywords_present, emotion_with_mobility_signal
+  THEN: fear_keywords_present
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 2.54
+  Insight: nan
+  Recommendation: nan
+
+Rule 30:
+  IF:   solidarity_messages, emotion_with_mobility_signal
+  THEN: fear_keywords_present
+  Support: 4 days (12.1%)
+  Confidence: 100.0%
+  Lift: 2.54
+  Insight: nan
+  Recommendation: nan
+
+Rule 31:
   IF:   anger_mentioned, solidarity_messages
   THEN: sadness_keywords_present
   Support: 5 days (15.2%)
   Confidence: 80.0%
   Lift: 2.40
-  LLM: novelty=4/10  policy_relevance=4/10
-  Why it matters: The connection between anger and solidarity messages leading to sadness suggests that community dynamics can shift unexpectedly during crises.
-  Policy recommendation: Encourage solidarity initiatives that foster community support, especially when anger is prevalent, to mitigate sadness.
+  Insight: nan
+  Recommendation: nan
 
-Rule 16:
+Rule 32:
+  IF:   weekend, emotion_mobility_mismatch
+  THEN: high_negative_sentiment
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 2.40
+  Insight: nan
+  Recommendation: nan
+
+Rule 33:
+  IF:   emotion_with_mobility_signal
+  THEN: fear_keywords_present
+  Support: 9 days (27.3%)
+  Confidence: 88.9%
+  Lift: 2.26
+  Insight: nan
+  Recommendation: nan
+
+Rule 34:
+  IF:   anger_mentioned
+  THEN: fear_keywords_present
+  Support: 7 days (21.2%)
+  Confidence: 85.7%
+  Lift: 2.18
+  Insight: nan
+  Recommendation: nan
+
+Rule 35:
+  IF:   mixed_emotions
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 2.03
+  Insight: nan
+  Recommendation: nan
+
+Rule 36:
+  IF:   anger_mentioned, policy_governance_discussion
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 2.03
+  Insight: nan
+  Recommendation: nan
+
+Rule 37:
+  IF:   anger_mentioned, solidarity_messages
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 2.03
+  Insight: nan
+  Recommendation: nan
+
+Rule 38:
+  IF:   sadness_keywords_present, mixed_emotions
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 2.03
+  Insight: nan
+  Recommendation: nan
+
+Rule 39:
   IF:   anger_mentioned, sadness_keywords_present
   THEN: solidarity_messages
   Support: 4 days (12.1%)
   Confidence: 100.0%
   Lift: 1.83
-  LLM: novelty=4/10  policy_relevance=4/10
-  Why it matters: Anger and sadness leading to solidarity messages indicates that emotional responses can drive community cohesion in unexpected ways.
-  Policy recommendation: Promote community solidarity initiatives during times of heightened anger to foster resilience and support.
+  Insight: nan
+  Recommendation: nan
 
-Rule 17:
+Rule 40:
   IF:   anger_mentioned, mixed_emotions
   THEN: solidarity_messages
   Support: 4 days (12.1%)
   Confidence: 100.0%
   Lift: 1.83
-  LLM: novelty=4/10  policy_relevance=4/10
-  Why it matters: Anger and mixed emotions leading to solidarity messages suggests that emotional complexity can drive community engagement, which is not commonly recognized.
-  Policy recommendation: Leverage mixed emotions to create community engagement strategies that promote solidarity and support.
+  Insight: nan
+  Recommendation: nan
 
-Rule 18:
+Rule 41:
   IF:   policy_governance_discussion, low_emotion_low_mobility_signal
   THEN: solidarity_messages
   Support: 4 days (12.1%)
   Confidence: 100.0%
   Lift: 1.83
-  LLM: novelty=4/10  policy_relevance=4/10
-  Why it matters: Low emotion and low mobility signals leading to solidarity messages indicates that even in low engagement scenarios, community support can emerge unexpectedly.
-  Policy recommendation: Encourage community outreach programs that foster solidarity even in low engagement periods to maintain connections.
+  Insight: nan
+  Recommendation: nan
+
+Rule 42:
+  IF:   anger_mentioned, solidarity_messages
+  THEN: policy_governance_discussion
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 1.65
+  Insight: nan
+  Recommendation: nan
+
+Rule 43:
+  IF:   anger_mentioned, emotion_with_mobility_signal
+  THEN: policy_governance_discussion
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 1.65
+  Insight: nan
+  Recommendation: nan
+
+Rule 44:
+  IF:   weekend, emotion_mobility_mismatch
+  THEN: policy_governance_discussion
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 1.65
+  Insight: nan
+  Recommendation: nan
+
+Rule 45:
+  IF:   mixed_emotions
+  THEN: solidarity_messages
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 1.47
+  Insight: nan
+  Recommendation: nan
+
+Rule 46:
+  IF:   anger_mentioned, policy_governance_discussion
+  THEN: solidarity_messages
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 1.47
+  Insight: nan
+  Recommendation: nan
+
+Rule 47:
+  IF:   sadness_keywords_present, mixed_emotions
+  THEN: solidarity_messages
+  Support: 5 days (15.2%)
+  Confidence: 80.0%
+  Lift: 1.47
+  Insight: nan
+  Recommendation: nan
 
 ================================================================================

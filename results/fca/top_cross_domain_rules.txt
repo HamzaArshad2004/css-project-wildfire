@@ -1,151 +1,390 @@
 ========================================================================
   TOP RULES -- CROSS-DOMAIN MOBILITY x EMOTION ANALYSIS
   LA WILDFIRES 2025 (Jan 3 – Feb 4, 2025 | 33 days)
-  LLM-SELECTED: Top 20 Most Novel & Policy-Relevant Rules
+  Ordered by statistics (cross-domain, lift, confidence).
+  LLM provides policy annotation only; it does not rank or select.
 ========================================================================
 
 ── RULE PIPELINE QUALITY SUMMARY ───────────────────────────────
-  Total rules mined   : 47
-  Cross-domain rules  : 6 (12.8%)
-  Mean lift           : 2.69
-  Mean confidence     : 88.4%
-  LLM avg novelty     : 6.9/10
-  LLM avg policy      : 5.9/10
+  Total rules (statistically valid): 47
+  Cross-domain rules               : 6 (12.8%)
+  Mean lift                        : 2.69
+  Mean confidence                  : 88.4%
 ────────────────────────────────────────────────────────────────────────
 
 Rule 1: [CROSS-DOMAIN]
   IF:   traffic_congestion_detected, anger_mentioned
   THEN: fear_keywords_present
   Support: 5 days (15.2%)  Confidence: 100.0%  Lift: 2.54
-  LLM: novelty=10/10  policy_relevance=9/10
-  Insight: During the Ignition & rapid spread phase, traffic congestion and anger mentioned on Reddit predict fear keywords. This counter-intuitive direction suggests that increased traffic stress may amplify fear responses among residents.
-  Recommendation: LA County OES should monitor traffic congestion and anger mentions on social media, triggering immediate community outreach to address fears and provide updates.
+  Policy relevance (LLM annotation): 8/10
+  Insight: This rule relates to Phase 2, where traffic congestion and anger are prevalent. The direction of mobility influencing emotion is operationally interesting as it indicates that traffic issues may exacerbate fear among residents.
+  Recommendation: LA County OES should monitor traffic congestion and anger mentions on social media, and consider issuing timely updates to mitigate fear.
 
 Rule 2: [CROSS-DOMAIN]
   IF:   traffic_congestion_detected, emotion_with_mobility_signal
   THEN: fear_keywords_present
   Support: 9 days (27.3%)  Confidence: 88.9%  Lift: 2.26
-  LLM: novelty=9/10  policy_relevance=8/10
-  Insight: In the Peak crisis phase, traffic congestion combined with any emotion signals predicts fear keywords. This surprising association indicates that physical disruptions can heighten emotional responses, which may not be immediately obvious.
-  Recommendation: LAPD should track traffic congestion alongside emotional signals on social media to better anticipate and manage public anxiety during crises.
+  Policy relevance (LLM annotation): 8/10
+  Insight: In Phase 2, the interplay between traffic congestion and emotional signals is critical. The mobility-to-emotion direction suggests that traffic conditions can heighten fear, warranting further investigation.
+  Recommendation: LAPD should track traffic congestion alongside emotional signals on Reddit to inform public safety messaging during crises.
 
 Rule 3: [CROSS-DOMAIN]
-  IF:   traffic_congestion_detected, sadness_keywords_present
-  THEN: policy_governance_discussion
-  Support: 6 days (18.2%)  Confidence: 83.3%  Lift: 1.72
-  LLM: novelty=8/10  policy_relevance=7/10
-  Insight: During the Peak crisis phase, traffic congestion and sadness keywords lead to discussions about policy governance. This suggests that emotional distress can drive civic engagement and policy discourse.
-  Recommendation: LA DPW should monitor traffic congestion and sadness discussions to identify opportunities for community engagement and policy discussions that address public concerns.
-
-Rule 4: [CROSS-DOMAIN]
-  IF:   traffic_congestion_detected, anger_mentioned
-  THEN: policy_governance_discussion
-  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 1.65
-  LLM: novelty=8/10  policy_relevance=7/10
-  Insight: In the Peak crisis phase, traffic congestion and anger lead to policy governance discussions. This indicates that heightened emotions can prompt residents to seek clarity and action from authorities.
-  Recommendation: CAL FIRE should monitor traffic congestion and anger mentions to proactively engage with the community and provide timely updates on fire management efforts.
-
-Rule 5: [CROSS-DOMAIN]
   IF:   fear_keywords_present, anger_mentioned
   THEN: traffic_congestion_detected
   Support: 6 days (18.2%)  Confidence: 83.3%  Lift: 1.96
-  LLM: novelty=8/10  policy_relevance=6/10
-  Insight: During the Peak crisis phase, fear keywords and anger mentioned predict traffic congestion. This suggests that emotional distress can lead to increased mobility stress, which is not a typical assumption.
-  Recommendation: LA County OES should track fear and anger signals to anticipate traffic patterns and prepare for potential evacuation needs.
+  Policy relevance (LLM annotation): 7/10
+  Insight: This rule is relevant in Phase 2, indicating that fear can be a response to anger and traffic congestion. The emotion-to-mobility direction is useful for understanding public sentiment.
+  Recommendation: LA County OES should monitor fear levels in conjunction with traffic data to assess community anxiety and adjust communication strategies.
 
-Rule 6: [CROSS-DOMAIN]
+Rule 4: [CROSS-DOMAIN]
   IF:   anger_mentioned, policy_governance_discussion
   THEN: traffic_congestion_detected
   Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 1.89
-  LLM: novelty=7/10  policy_relevance=6/10
-  Insight: In the Peak crisis phase, anger and policy governance discussions lead to traffic congestion. This indicates that public discourse can influence mobility patterns, which is an unexpected insight.
-  Recommendation: LAPD should monitor public discussions around policy to better understand and manage traffic implications during crises.
+  Policy relevance (LLM annotation): 7/10
+  Insight: In Phase 2, the combination of anger and governance discussions leading to traffic congestion highlights the importance of public discourse. The emotion-to-mobility direction is insightful.
+  Recommendation: LAPD should monitor discussions of policy governance alongside traffic metrics to identify potential public unrest and respond accordingly.
+
+Rule 5: [CROSS-DOMAIN]
+  IF:   traffic_congestion_detected, sadness_keywords_present
+  THEN: policy_governance_discussion
+  Support: 6 days (18.2%)  Confidence: 83.3%  Lift: 1.72
+  Policy relevance (LLM annotation): 6/10
+  Insight: This rule is applicable in Phase 2, showing that traffic congestion may trigger discussions about governance. The mobility-to-emotion direction is less direct but still relevant.
+  Recommendation: LA DPW should track traffic congestion and governance discussions to better understand community concerns and improve traffic management.
+
+Rule 6: [CROSS-DOMAIN]
+  IF:   traffic_congestion_detected, anger_mentioned
+  THEN: policy_governance_discussion
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 1.65
+  Policy relevance (LLM annotation): 6/10
+  Insight: In Phase 2, the link between anger and governance discussions affecting traffic congestion is noteworthy. The emotion-to-mobility direction provides insights into public sentiment.
+  Recommendation: LA County OES should monitor anger mentions and traffic data to gauge community sentiment and enhance communication strategies.
 
 Rule 7:
-  IF:   fear_keywords_present, anger_mentioned
-  THEN: emotion_with_mobility_signal
-  Support: 6 days (18.2%)  Confidence: 83.3%  Lift: 3.06
-  LLM: novelty=7/10  policy_relevance=6/10
-  Insight: During the Peak crisis phase, fear keywords and anger mentioned predict an emotion with mobility signal. This unexpected association highlights how emotional responses can influence mobility behaviors.
-  Recommendation: LA County OES should monitor fear and anger signals to anticipate changes in mobility and prepare appropriate responses.
-
-Rule 8:
-  IF:   policy_governance_discussion, emotion_with_mobility_signal
-  THEN: fear_keywords_present
-  Support: 5 days (15.2%)  Confidence: 100.0%  Lift: 2.54
-  LLM: novelty=7/10  policy_relevance=6/10
-  Insight: In the Peak crisis phase, policy governance discussions and emotion with mobility signals lead to fear keywords. This suggests that discussions about governance can amplify emotional responses.
-  Recommendation: LA DPW should monitor policy discussions alongside emotional signals to better address community concerns and fears.
-
-Rule 9:
-  IF:   anger_mentioned, emotion_with_mobility_signal
-  THEN: fear_keywords_present
-  Support: 5 days (15.2%)  Confidence: 100.0%  Lift: 2.54
-  LLM: novelty=6/10  policy_relevance=5/10
-  Insight: During the Peak crisis phase, anger mentioned and emotion with mobility signals predict fear keywords. This indicates that emotional responses can be linked to physical mobility signals.
-  Recommendation: LAPD should track anger mentions alongside mobility signals to better understand community sentiment and prepare for potential unrest.
-
-Rule 10:
   IF:   anger_mentioned, sadness_keywords_present
   THEN: mixed_emotions
   Support: 4 days (12.1%)  Confidence: 100.0%  Lift: 6.60
-  LLM: novelty=6/10  policy_relevance=5/10
-  Insight: In the Peak crisis phase, anger and sadness keywords lead to mixed emotions. This suggests that emotional complexity can arise during crises, which is important for understanding community sentiment.
-  Recommendation: LA County OES should monitor emotional complexity to tailor communication strategies that resonate with the community.
+  Policy relevance (LLM annotation): 5/10
+  Insight: This rule indicates that anger and sadness can lead to mixed emotions, relevant in Phase 3. The lack of direct mobility implications limits its operational use.
+  Recommendation: LA County OES should monitor mixed emotions to understand community sentiment during peak crisis periods, though no immediate action is required.
 
-Rule 11:
+Rule 8:
   IF:   anger_mentioned, solidarity_messages
   THEN: mixed_emotions
   Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 5.28
-  LLM: novelty=6/10  policy_relevance=5/10
-  Insight: During the Peak crisis phase, anger mentioned and solidarity messages lead to mixed emotions. This indicates that community solidarity can coexist with negative emotions, which is a nuanced insight.
-  Recommendation: LA DPW should leverage solidarity messaging to address mixed emotions and foster community resilience during crises.
+  Policy relevance (LLM annotation): 5/10
+  Insight: In Phase 3, the relationship between anger and solidarity messages resulting in mixed emotions is interesting but lacks direct mobility implications.
+  Recommendation: LA County OES should observe the sentiment around solidarity messages to gauge community morale, without immediate intervention.
 
-Rule 12:
+Rule 9:
+  IF:   mixed_emotions, solidarity_messages
+  THEN: anger_mentioned
+  Support: 4 days (12.1%)  Confidence: 100.0%  Lift: 4.71
+  Policy relevance (LLM annotation): 4/10
+  Insight: This rule shows that mixed emotions can lead to anger, relevant in Phase 3. However, it does not provide a clear intervention opportunity.
+  Recommendation: LA County OES should monitor mixed emotions to understand community dynamics but may not require immediate action.
+
+Rule 10:
+  IF:   mixed_emotions
+  THEN: anger_mentioned
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 3.77
+  Policy relevance (LLM annotation): 4/10
+  Insight: In Phase 3, mixed emotions leading to anger is noted, but the lack of mobility implications limits its operational relevance.
+  Recommendation: LA County OES should track mixed emotions to assess community sentiment, though no direct action is indicated.
+
+Rule 11:
   IF:   high_negative_sentiment, sentiment_shift_detected
   THEN: sentiment_worsened
   Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 3.77
-  LLM: novelty=6/10  policy_relevance=5/10
-  Insight: In the Peak crisis phase, high negative sentiment and sentiment shift detected lead to sentiment worsening. This expected co-occurrence highlights the need for monitoring emotional trends.
-  Recommendation: LA County OES should track negative sentiment trends to anticipate community needs and adjust communication strategies.
+  Policy relevance (LLM annotation): 5/10
+  Insight: This rule is relevant in Phase 3, indicating that high negative sentiment and sentiment shifts can lead to worsened sentiment. It serves as a useful monitoring signal.
+  Recommendation: LA County OES should monitor sentiment shifts to better understand community reactions and adjust messaging as needed.
 
-Rule 13:
+Rule 12:
   IF:   sentiment_shift_detected, fear_keywords_present
   THEN: sentiment_worsened
   Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 3.77
-  LLM: novelty=6/10  policy_relevance=5/10
-  Insight: During the Peak crisis phase, sentiment shift detected and fear keywords present lead to sentiment worsening. This suggests that fear can exacerbate negative sentiment, which is critical for understanding community dynamics.
-  Recommendation: LAPD should monitor fear signals to anticipate shifts in community sentiment and respond proactively.
+  Policy relevance (LLM annotation): 5/10
+  Insight: In Phase 3, the relationship between fear keywords and sentiment worsening is notable, providing a useful monitoring signal.
+  Recommendation: LA County OES should track fear keywords alongside sentiment metrics to gauge community anxiety and adapt communication strategies.
 
-Rule 14:
+Rule 13:
   IF:   sadness_keywords_present, mixed_emotions
   THEN: anger_mentioned
   Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 3.77
-  LLM: novelty=6/10  policy_relevance=5/10
-  Insight: In the Peak crisis phase, sadness keywords and mixed emotions lead to anger mentioned. This indicates that emotional complexity can lead to increased anger, which is important for crisis management.
-  Recommendation: LA County OES should monitor emotional complexity to better address community concerns and mitigate anger.
+  Policy relevance (LLM annotation): 4/10
+  Insight: This rule indicates that mixed emotions can lead to anger, relevant in Phase 3, but lacks direct mobility implications.
+  Recommendation: LA County OES should monitor mixed emotions to understand community sentiment, though no immediate action is required.
 
-Rule 15:
+Rule 14:
   IF:   policy_governance_discussion, emotion_with_mobility_signal
   THEN: anger_mentioned
   Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 3.77
-  LLM: novelty=6/10  policy_relevance=5/10
-  Insight: During the Peak crisis phase, policy governance discussions and emotion with mobility signals lead to anger mentioned. This suggests that governance discussions can provoke strong emotional responses.
-  Recommendation: LA DPW should track governance discussions to anticipate emotional responses and prepare appropriate communication strategies.
+  Policy relevance (LLM annotation): 5/10
+  Insight: In Phase 3, the interplay between governance discussions and emotional signals leading to anger is relevant, providing a useful monitoring signal.
+  Recommendation: LA County OES should track governance discussions alongside emotional signals to assess community sentiment and inform public messaging.
+
+Rule 15:
+  IF:   high_negative_sentiment, weekend
+  THEN: emotion_mobility_mismatch
+  Support: 4 days (12.1%)  Confidence: 100.0%  Lift: 3.67
+  Policy relevance (LLM annotation): 4/10
+  Insight: This rule indicates that high negative sentiment during weekends can lead to emotion-mobility mismatches, relevant for situational awareness.
+  Recommendation: LA County OES should monitor sentiment trends during weekends to understand community dynamics, though no direct action is indicated.
 
 Rule 16:
+  IF:   policy_governance_discussion, emotion_mobility_mismatch
+  THEN: weekend
+  Support: 4 days (12.1%)  Confidence: 100.0%  Lift: 3.67
+  Policy relevance (LLM annotation): 4/10
+  Insight: In Phase 3, the relationship between governance discussions and emotion-mobility mismatches during weekends is noted, but lacks direct intervention opportunities.
+  Recommendation: LA County OES should observe governance discussions during weekends to gauge community sentiment, without immediate action required.
+
+Rule 17:
+  IF:   fear_keywords_present, anger_mentioned
+  THEN: emotion_with_mobility_signal
+  Support: 6 days (18.2%)  Confidence: 83.3%  Lift: 3.06
+  Policy relevance (LLM annotation): 5/10
+  Insight: This rule indicates that fear can be influenced by anger and governance discussions, relevant in Phase 3, providing a useful monitoring signal.
+  Recommendation: LA County OES should monitor fear keywords alongside governance discussions to assess community sentiment and adjust messaging.
+
+Rule 18:
+  IF:   mixed_emotions
+  THEN: sadness_keywords_present
+  Support: 5 days (15.2%)  Confidence: 100.0%  Lift: 3.00
+  Policy relevance (LLM annotation): 4/10
+  Insight: In Phase 3, mixed emotions leading to sadness is noted, but it does not provide a clear intervention opportunity.
+  Recommendation: LA County OES should monitor mixed emotions to understand community dynamics, though no immediate action is indicated.
+
+Rule 19:
   IF:   sentiment_shift_detected, emotion_mobility_mismatch
   THEN: high_negative_sentiment
   Support: 4 days (12.1%)  Confidence: 100.0%  Lift: 3.00
-  LLM: novelty=6/10  policy_relevance=5/10
-  Insight: In the Peak crisis phase, sentiment shift detected and emotion mobility mismatch lead to high negative sentiment. This indicates that mismatches between emotions and mobility can exacerbate negative feelings.
-  Recommendation: LA County OES should monitor emotional mobility mismatches to better understand community sentiment and adjust responses.
+  Policy relevance (LLM annotation): 4/10
+  Insight: This rule indicates that sentiment shifts can lead to high negative sentiment, relevant in Phase 3, but lacks direct mobility implications.
+  Recommendation: LA County OES should track sentiment shifts to gauge community reactions, though no direct action is indicated.
 
-Rule 17:
+Rule 20:
   IF:   fear_keywords_present, mixed_emotions
   THEN: sadness_keywords_present
   Support: 4 days (12.1%)  Confidence: 100.0%  Lift: 3.00
-  LLM: novelty=6/10  policy_relevance=5/10
-  Insight: During the Peak crisis phase, fear keywords and mixed emotions lead to sadness keywords. This suggests that fear can contribute to feelings of sadness, which is important for understanding emotional dynamics.
-  Recommendation: LAPD should monitor fear and mixed emotions to better address community sentiment and provide support.
+  Policy relevance (LLM annotation): 4/10
+  Insight: In Phase 3, the relationship between fear and mixed emotions leading to sadness is noted, but lacks direct intervention opportunities.
+  Recommendation: LA County OES should monitor mixed emotions to understand community sentiment, though no immediate action is required.
+
+Rule 21:
+  IF:   anger_mentioned, mixed_emotions
+  THEN: sadness_keywords_present
+  Support: 4 days (12.1%)  Confidence: 100.0%  Lift: 3.00
+  Policy relevance (LLM annotation): 4/10
+  Insight: This rule indicates that mixed emotions can lead to sadness, relevant in Phase 3, but does not provide a clear intervention opportunity.
+  Recommendation: LA County OES should track mixed emotions to assess community sentiment, though no direct action is indicated.
+
+Rule 22:
+  IF:   mixed_emotions, solidarity_messages
+  THEN: sadness_keywords_present
+  Support: 4 days (12.1%)  Confidence: 100.0%  Lift: 3.00
+  Policy relevance (LLM annotation): 4/10
+  Insight: In Phase 3, mixed emotions leading to sadness is noted, but it does not provide a clear intervention opportunity.
+  Recommendation: LA County OES should monitor mixed emotions to understand community dynamics, though no immediate action is indicated.
+
+Rule 23:
+  IF:   high_negative_sentiment, sentiment_shift_detected
+  THEN: emotion_mobility_mismatch
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 2.93
+  Policy relevance (LLM annotation): 5/10
+  Insight: This rule indicates that high negative sentiment and sentiment shifts can lead to emotion-mobility mismatches, relevant for monitoring.
+  Recommendation: LA County OES should track sentiment shifts to understand community dynamics and adjust communication strategies as needed.
+
+Rule 24:
+  IF:   anger_mentioned, policy_governance_discussion
+  THEN: emotion_with_mobility_signal
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 2.93
+  Policy relevance (LLM annotation): 5/10
+  Insight: In Phase 3, the interplay between governance discussions and emotional signals leading to anger is relevant, providing a useful monitoring signal.
+  Recommendation: LA County OES should track governance discussions alongside emotional signals to assess community sentiment and inform public messaging.
+
+Rule 25:
+  IF:   policy_governance_discussion, weekend
+  THEN: emotion_mobility_mismatch
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 2.93
+  Policy relevance (LLM annotation): 4/10
+  Insight: This rule indicates that governance discussions during weekends can lead to emotion-mobility mismatches, relevant for situational awareness.
+  Recommendation: LA County OES should monitor governance discussions during weekends to understand community dynamics, though no direct action is indicated.
+
+Rule 26:
+  IF:   dominant_emotion_fear
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)  Confidence: 100.0%  Lift: 2.54
+  Policy relevance (LLM annotation): 5/10
+  Insight: In Phase 3, the presence of fear keywords is directly linked to dominant emotions, providing a useful monitoring signal.
+  Recommendation: LA County OES should monitor fear keywords to assess community sentiment and adapt communication strategies accordingly.
+
+Rule 27:
+  IF:   anger_mentioned, emotion_with_mobility_signal
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)  Confidence: 100.0%  Lift: 2.54
+  Policy relevance (LLM annotation): 5/10
+  Insight: This rule indicates that anger and mobility signals can lead to fear, relevant in Phase 3, providing a useful monitoring signal.
+  Recommendation: LA County OES should track anger mentions alongside mobility signals to gauge community sentiment and inform public messaging.
+
+Rule 28:
+  IF:   policy_governance_discussion, emotion_with_mobility_signal
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)  Confidence: 100.0%  Lift: 2.54
+  Policy relevance (LLM annotation): 5/10
+  Insight: In Phase 3, governance discussions and emotional signals leading to fear is noted, providing a useful monitoring signal.
+  Recommendation: LA County OES should monitor governance discussions alongside emotional signals to assess community sentiment and adjust messaging.
+
+Rule 29:
+  IF:   sadness_keywords_present, emotion_with_mobility_signal
+  THEN: fear_keywords_present
+  Support: 4 days (12.1%)  Confidence: 100.0%  Lift: 2.54
+  Policy relevance (LLM annotation): 5/10
+  Insight: This rule indicates that sadness keywords and mobility signals can lead to fear, relevant in Phase 3, providing a useful monitoring signal.
+  Recommendation: LA County OES should track sadness keywords alongside mobility signals to gauge community sentiment and inform public messaging.
+
+Rule 30:
+  IF:   solidarity_messages, emotion_with_mobility_signal
+  THEN: fear_keywords_present
+  Support: 4 days (12.1%)  Confidence: 100.0%  Lift: 2.54
+  Policy relevance (LLM annotation): 5/10
+  Insight: In Phase 3, solidarity messages and mobility signals leading to fear is noted, providing a useful monitoring signal.
+  Recommendation: LA County OES should monitor solidarity messages alongside mobility signals to assess community sentiment and adjust communication strategies.
+
+Rule 31:
+  IF:   anger_mentioned, solidarity_messages
+  THEN: sadness_keywords_present
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 2.40
+  Policy relevance (LLM annotation): 5/10
+  Insight: This rule indicates that anger and solidarity messages can lead to sadness, relevant in Phase 3, providing a useful monitoring signal.
+  Recommendation: LA County OES should track anger mentions alongside solidarity messages to gauge community sentiment and inform public messaging.
+
+Rule 32:
+  IF:   weekend, emotion_mobility_mismatch
+  THEN: high_negative_sentiment
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 2.40
+  Policy relevance (LLM annotation): 5/10
+  Insight: In Phase 3, the relationship between weekends and emotion-mobility mismatches is noted, providing a useful monitoring signal.
+  Recommendation: LA County OES should monitor sentiment trends during weekends to understand community dynamics and adjust communication strategies.
+
+Rule 33:
+  IF:   emotion_with_mobility_signal
+  THEN: fear_keywords_present
+  Support: 9 days (27.3%)  Confidence: 88.9%  Lift: 2.26
+  Policy relevance (LLM annotation): 5/10
+  Insight: This rule indicates that mobility signals can lead to fear, relevant in Phase 3, providing a useful monitoring signal.
+  Recommendation: LA County OES should track mobility signals to assess community sentiment and adapt communication strategies accordingly.
+
+Rule 34:
+  IF:   anger_mentioned
+  THEN: fear_keywords_present
+  Support: 7 days (21.2%)  Confidence: 85.7%  Lift: 2.18
+  Policy relevance (LLM annotation): 5/10
+  Insight: In Phase 3, anger leading to fear is noted, providing a useful monitoring signal for community sentiment.
+  Recommendation: LA County OES should monitor anger mentions to gauge community sentiment and inform public messaging.
+
+Rule 35:
+  IF:   mixed_emotions
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 2.03
+  Policy relevance (LLM annotation): 5/10
+  Insight: This rule indicates that mixed emotions can lead to fear, relevant in Phase 3, providing a useful monitoring signal.
+  Recommendation: LA County OES should track mixed emotions to assess community sentiment and adapt communication strategies accordingly.
+
+Rule 36:
+  IF:   anger_mentioned, policy_governance_discussion
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 2.03
+  Policy relevance (LLM annotation): 5/10
+  Insight: In Phase 3, the relationship between anger and governance discussions leading to fear is noted, providing a useful monitoring signal.
+  Recommendation: LA County OES should monitor anger mentions alongside governance discussions to assess community sentiment and inform public messaging.
+
+Rule 37:
+  IF:   anger_mentioned, solidarity_messages
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 2.03
+  Policy relevance (LLM annotation): 5/10
+  Insight: This rule indicates that anger and solidarity messages can lead to fear, relevant in Phase 3, providing a useful monitoring signal.
+  Recommendation: LA County OES should track anger mentions alongside solidarity messages to gauge community sentiment and inform public messaging.
+
+Rule 38:
+  IF:   sadness_keywords_present, mixed_emotions
+  THEN: fear_keywords_present
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 2.03
+  Policy relevance (LLM annotation): 5/10
+  Insight: In Phase 3, sadness stemming from mixed emotions is noted, providing a useful monitoring signal.
+  Recommendation: LA County OES should monitor mixed emotions to understand community sentiment and adjust communication strategies as needed.
+
+Rule 39:
+  IF:   anger_mentioned, sadness_keywords_present
+  THEN: solidarity_messages
+  Support: 4 days (12.1%)  Confidence: 100.0%  Lift: 1.83
+  Policy relevance (LLM annotation): 4/10
+  Insight: This rule indicates that anger and sadness can lead to solidarity messages, relevant in Phase 3, but lacks direct mobility implications.
+  Recommendation: LA County OES should observe the sentiment around solidarity messages to gauge community morale, without immediate intervention.
+
+Rule 40:
+  IF:   anger_mentioned, mixed_emotions
+  THEN: solidarity_messages
+  Support: 4 days (12.1%)  Confidence: 100.0%  Lift: 1.83
+  Policy relevance (LLM annotation): 4/10
+  Insight: In Phase 3, the relationship between anger and mixed emotions leading to solidarity messages is noted, but lacks direct intervention opportunities.
+  Recommendation: LA County OES should monitor mixed emotions to understand community dynamics, though no immediate action is indicated.
+
+Rule 41:
+  IF:   policy_governance_discussion, low_emotion_low_mobility_signal
+  THEN: solidarity_messages
+  Support: 4 days (12.1%)  Confidence: 100.0%  Lift: 1.83
+  Policy relevance (LLM annotation): 4/10
+  Insight: This rule indicates that governance discussions and low emotion-low mobility signals can lead to solidarity messages, relevant for situational awareness.
+  Recommendation: LA County OES should monitor governance discussions to understand community dynamics, though no direct action is indicated.
+
+Rule 42:
+  IF:   anger_mentioned, solidarity_messages
+  THEN: policy_governance_discussion
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 1.65
+  Policy relevance (LLM annotation): 4/10
+  Insight: In Phase 3, the relationship between anger and governance discussions leading to solidarity messages is noted, but lacks direct intervention opportunities.
+  Recommendation: LA County OES should monitor governance discussions to gauge community sentiment, though no immediate action is required.
+
+Rule 43:
+  IF:   anger_mentioned, emotion_with_mobility_signal
+  THEN: policy_governance_discussion
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 1.65
+  Policy relevance (LLM annotation): 4/10
+  Insight: This rule indicates that anger and mobility signals can lead to governance discussions, relevant in Phase 3, but lacks direct intervention opportunities.
+  Recommendation: LA County OES should monitor anger mentions alongside mobility signals to understand community dynamics, though no immediate action is indicated.
+
+Rule 44:
+  IF:   weekend, emotion_mobility_mismatch
+  THEN: policy_governance_discussion
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 1.65
+  Policy relevance (LLM annotation): 4/10
+  Insight: In Phase 3, the relationship between weekends and governance discussions leading to solidarity messages is noted, but lacks direct intervention opportunities.
+  Recommendation: LA County OES should observe governance discussions during weekends to gauge community sentiment, without immediate action required.
+
+Rule 45:
+  IF:   mixed_emotions
+  THEN: solidarity_messages
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 1.47
+  Policy relevance (LLM annotation): 4/10
+  Insight: This rule indicates that mixed emotions can lead to solidarity messages, relevant in Phase 3, but lacks direct mobility implications.
+  Recommendation: LA County OES should monitor mixed emotions to understand community dynamics, though no immediate action is indicated.
+
+Rule 46:
+  IF:   anger_mentioned, policy_governance_discussion
+  THEN: solidarity_messages
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 1.47
+  Policy relevance (LLM annotation): 4/10
+  Insight: In Phase 3, the relationship between anger and governance discussions leading to solidarity messages is noted, but lacks direct intervention opportunities.
+  Recommendation: LA County OES should monitor governance discussions to gauge community sentiment, though no immediate action is required.
+
+Rule 47:
+  IF:   sadness_keywords_present, mixed_emotions
+  THEN: solidarity_messages
+  Support: 5 days (15.2%)  Confidence: 80.0%  Lift: 1.47
+  Policy relevance (LLM annotation): 4/10
+  Insight: This rule indicates that sadness stemming from mixed emotions can lead to solidarity messages, relevant in Phase 3, but lacks direct mobility implications.
+  Recommendation: LA County OES should monitor mixed emotions to understand community sentiment, though no immediate action is indicated.
 

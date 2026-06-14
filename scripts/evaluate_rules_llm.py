@@ -1,20 +1,22 @@
 """
-LLM-based rule evaluation and prioritization.
+LLM-based rule annotation (NOT selection or ranking).
 
-Loads association rules from FCA, then optionally uses an OpenAI-compatible
-LLM to identify the top 20 most novel and policy-relevant rules in a single
-batch call.  Cross-domain rules are always flagged and sorted to the top
-regardless of whether the LLM step is run.
+Loads association rules from FCA. Rule validity is determined ENTIRELY by the
+statistical pipeline (support, confidence, lift) and the tautology filter in
+fca_analysis.py. The optional LLM step is a post-hoc QUALITATIVE ANNOTATION
+layer only: it scores each already-valid rule for policy relevance and writes a
+plain-language rationale and a named-agency recommendation. It never selects,
+ranks, or validates rules.
 
-Usage (without LLM -- statistical ranking only):
+Usage (without LLM -- statistical ordering only):
     python scripts/evaluate_rules_llm.py
 
-Usage (with LLM selection -- requires OPENAI_API_KEY in .env or environment):
+Usage (with LLM annotation -- requires OPENAI_API_KEY in .env or environment):
     python scripts/evaluate_rules_llm.py --llm
 
 Output:
-    results/fca/association_rules_evaluated.csv   (all rules with LLM scores if run)
-    results/fca/top_cross_domain_rules.txt        (top N human-readable summary)
+    results/fca/association_rules_evaluated.csv   (all rules, annotated if --llm)
+    results/fca/top_cross_domain_rules.txt        (human-readable summary)
 """
 
 import argparse
@@ -55,15 +57,19 @@ EMOTION_FEATURES = frozenset({
     "policy_governance_discussion",
 })
 
-CANDIDATE_POOL = 100
-TOP_N_LLM = 20
-
-BATCH_SYSTEM_PROMPT = textwrap.dedent("""\
+ANNOTATE_SYSTEM_PROMPT = textwrap.dedent("""\
     You are an expert data scientist and emergency management policy advisor
-    reviewing association rules mined from LA Wildfire 2025 crisis behavior data
+    annotating association rules mined from LA Wildfire 2025 crisis behavior data
     (January 3 – February 4, 2025). The dataset covers 33 days and combines
     daily LA traffic metrics (VMT, TTI) with Reddit sentiment signals from
     local subreddits.
+
+    IMPORTANT: These rules have ALREADY been validated by a statistical pipeline
+    (support, confidence, lift thresholds) and a tautology filter. Your job is
+    NOT to select, rank, validate, or reject any rule. Every rule you are given
+    is statistically valid. You provide ONLY a qualitative annotation for each:
+    a policy-relevance score, a short rationale, and a named-agency recommendation.
+    Score and annotate EVERY rule provided. Do not omit any.
 
     ── LA WILDFIRE 2025 CRISIS TIMELINE ──────────────────────────────────────
     Phase 1 — Pre-ignition (Jan 3–6):
@@ -86,25 +92,12 @@ BATCH_SYSTEM_PROMPT = textwrap.dedent("""\
       policy_governance_discussion, sentiment_improved, sentiment_worsened,
       sentiment_shift_detected, mixed_emotions
 
-    COMPOSITE features (do NOT select rules that simply unpack these):
-      emotion_with_mobility_signal = (any emotion) AND (any mobility signal)
-      emotion_mobility_mismatch    = (any emotion) AND NOT (any mobility signal)
-      low_emotion_low_mobility_signal = NOT(emotion) AND NOT(mobility)
-
-    ── NOVELTY SCORING RUBRIC (1–10) ─────────────────────────────────────────
-    10 — Cross-domain rule that reveals a counter-intuitive direction
-         (e.g. solidarity messaging predicts traffic reduction, or fear
-         keywords predict evacuation mentions with a specific crisis phase link).
-     8–9 — Cross-domain with a non-obvious direction; timing aligns with a
-         known phase but the association would surprise an emergency manager.
-     6–7 — Single-domain but reveals non-trivial co-occurrence within the
-         33-day crisis window.
-     4–5 — Expected co-occurrence (e.g. fear + high negative sentiment).
-     1–3 — Near-tautological or definitionally implied.
-    ──────────────────────────────────────────────────────────────────────────
-
     ── POLICY RELEVANCE SCORING RUBRIC (1–10) ────────────────────────────────
-    10 — Finding is directly actionable by a named LA agency (LAFD, CAL FIRE,
+    Score on whether a named LA agency could act on this rule. This score is an
+    annotation aid for the reader; it does NOT determine whether the rule is
+    kept (the statistical pipeline already did that).
+
+    10 — Directly actionable by a named LA agency (LAFD, CAL FIRE,
          LA County OES, LAPD, LA DPW) with a specific trigger and action.
      8–9 — Operationally useful; named agency and action obvious but needs
          one additional validation step.
@@ -113,32 +106,21 @@ BATCH_SYSTEM_PROMPT = textwrap.dedent("""\
      1–3 — Too generic or too rare to drive agency action.
     ──────────────────────────────────────────────────────────────────────────
 
-    MANDATORY EXCLUSIONS — do NOT select rules where:
-    - emotion_with_mobility_signal or emotion_mobility_mismatch is in the
-      PREMISE and traffic/evacuation is the CONCLUSION (tautological unpacking).
-    - Rules concluding sentiment_shift_detected when sentiment_improved or
-      sentiment_worsened is in the premise (definitional).
-    - Both premise and conclusion are purely within one domain with no
-      cross-domain element.
-    - More than 3 rules share the same conclusion.
+    For cross-domain rules (mobility × emotion/discourse), note in your rationale
+    whether the direction (emotion→mobility or mobility→emotion) is operationally
+    interesting and which crisis phase it most relates to.
 
-    PREFER:
-    - Emotion → mobility direction (social signal predicts physical response).
-    - Mobility → emotion direction (physical disruption predicts sentiment shift).
-    - Solidarity or policy discourse as surprising predictors.
-    - Rules with lift > 1.5 and support across multiple days.
+    IMPORTANT: Return EXACTLY ONE object per input rule, with the same rule_id.
+    The number of objects MUST equal the number of rules provided. Do not omit,
+    filter, deduplicate, or reorder by importance.
 
-    YOUR TASK: select and rank the TOP 20 most novel and policy-relevant rules.
-
-    Return ONLY a JSON array of exactly 20 objects (fewer if fewer qualify),
-    ordered best-first:
+    Return ONLY a JSON array with one object per rule (any order):
     [
       {
         "rule_id": <int>,
-        "novelty_score": <int 1-10>,
         "policy_score": <int 1-10>,
-        "reasoning": "<2-3 sentences: name the LA crisis phase, explain why the direction is non-obvious, and what it reveals about crisis behaviour>",
-        "policy_recommendation": "<2 sentences: name a specific LA agency, state the exact monitoring trigger and the recommended action>"
+        "reasoning": "<2-3 sentences: name the LA crisis phase, note whether the cross-domain direction is operationally interesting, and what it reveals>",
+        "policy_recommendation": "<2 sentences: name a specific LA agency, the monitoring trigger, and the recommended action>"
       },
       ...
     ]
@@ -180,7 +162,7 @@ def tag_cross_domain(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _build_candidate_block(df: pd.DataFrame) -> str:
-    """Render candidate rules as a numbered text block for the LLM prompt."""
+    """Render rules as a numbered text block for the LLM prompt."""
     lines = []
     has_conviction = "conviction" in df.columns
     for _, row in df.iterrows():
@@ -197,45 +179,16 @@ def _build_candidate_block(df: pd.DataFrame) -> str:
     return "\n".join(lines)
 
 
-def _stratified_candidates(df: pd.DataFrame, candidate_pool: int) -> pd.DataFrame:
-    """
-    Return a stratified candidate pool so the LLM sees both rule directions.
-    Split evenly between rules concluding a SOCIAL/EMOTION feature and those
-    concluding a MOBILITY feature. Fill any shortfall from the other stratum.
-    """
-    mob = MOBILITY_FEATURES
-    half = candidate_pool // 2
-
-    social_conclusion = (
-        df[df["cross_domain"] & ~df["conclusion"].isin(mob)]
-        .sort_values(["lift", "confidence"], ascending=False)
-        .head(half)
-    )
-    mob_conclusion = (
-        df[df["cross_domain"] & df["conclusion"].isin(mob)]
-        .sort_values(["lift", "confidence"], ascending=False)
-        .head(half)
-    )
-    combined = pd.concat([social_conclusion, mob_conclusion]).drop_duplicates()
-    if len(combined) < candidate_pool:
-        remaining = (
-            df[~df.index.isin(combined.index)]
-            .sort_values(["lift", "confidence"], ascending=False)
-            .head(candidate_pool - len(combined))
-        )
-        combined = pd.concat([combined, remaining])
-    return combined.head(candidate_pool)
-
-
-def select_top_rules_with_llm(
+def annotate_all_rules_with_llm(
     df: pd.DataFrame,
     model: str = "gpt-4o-mini",
-    candidate_pool: int = CANDIDATE_POOL,
-    top_n: int = TOP_N_LLM,
 ) -> pd.DataFrame:
-    """
-    Send a stratified pool of candidate rules to the LLM in one batch call and
-    ask it to select and rank the top_n most novel and policy-relevant ones.
+    """Annotate EVERY rule with the LLM (policy relevance + rationale), dropping none.
+
+    This is an annotation layer, not a selection or ranking step. Rule validity is
+    already established by the statistical pipeline upstream. Every rule passed in
+    is scored; nothing is filtered. Ordering of the output is by statistics, set
+    by the caller — not by any LLM score.
     """
     try:
         from openai import OpenAI
@@ -256,94 +209,98 @@ def select_top_rules_with_llm(
     df = df.copy().reset_index(drop=True)
     df["rule_id"] = df.index
 
-    candidates = _stratified_candidates(df, candidate_pool)
-    candidate_block = _build_candidate_block(candidates)
+    # Send ALL rules — no stratified subset, no candidate cap, no top-N.
+    candidate_block = _build_candidate_block(df)
+    n = len(df)
     user_msg = (
-        f"Select the top {top_n} rules from these {len(candidates)} candidates:\n\n"
-        + candidate_block
+        f"Annotate ALL {n} of the following validated rules. Return exactly {n} "
+        f"objects, one per rule_id:\n\n" + candidate_block
     )
 
-    print(f"  Sending {len(candidates)} candidate rules to LLM for batch selection ...")
+    print(f"  Sending ALL {n} rules to LLM for annotation ...")
     response = client.chat.completions.create(
         model=model,
         messages=[
-            {"role": "system", "content": BATCH_SYSTEM_PROMPT},
+            {"role": "system", "content": ANNOTATE_SYSTEM_PROMPT},
             {"role": "user", "content": user_msg},
         ],
         temperature=0.2,
-        max_tokens=2400,
+        max_tokens=4000,
     )
 
     raw = response.choices[0].message.content.strip()
-    # Strip markdown code fences if present
     if raw.startswith("```"):
         raw = raw.split("```", 2)[1]
         if raw.startswith("json"):
             raw = raw[4:]
         raw = raw.strip()
     try:
-        selections = json.loads(raw)
+        annotations = json.loads(raw)
     except json.JSONDecodeError:
         print(f"WARNING: LLM returned non-JSON response:\n{raw}", file=sys.stderr)
-        print("Falling back to statistical ranking.", file=sys.stderr)
+        print("Proceeding with statistical ordering and no annotations.", file=sys.stderr)
+        return df
+    if not isinstance(annotations, list):
+        print("WARNING: LLM response was not a JSON array; skipping annotations.", file=sys.stderr)
         return df
 
-    if not isinstance(selections, list):
-        print("WARNING: LLM response was not a JSON array; falling back to statistical ranking.",
-              file=sys.stderr)
-        return df
-
-    df["novelty_score"] = None
     df["policy_score"] = None
     df["llm_reasoning"] = ""
     df["llm_policy_recommendation"] = ""
-    df["llm_rank"] = None
 
     valid_ids = set(df["rule_id"].tolist())
-    for rank, entry in enumerate(selections[:top_n], start=1):
+    seen = set()
+    for entry in annotations:
         rid = entry.get("rule_id")
         if rid not in valid_ids:
             continue
         idx = df.index[df["rule_id"] == rid][0]
-        df.at[idx, "novelty_score"] = entry.get("novelty_score")
         df.at[idx, "policy_score"] = entry.get("policy_score")
         df.at[idx, "llm_reasoning"] = entry.get("reasoning", "")
         df.at[idx, "llm_policy_recommendation"] = entry.get("policy_recommendation", "")
-        df.at[idx, "llm_rank"] = rank
+        seen.add(rid)
 
-    df["llm_composite"] = df[["novelty_score", "policy_score"]].mean(axis=1)
-    print(f"  LLM selected {df['llm_rank'].notna().sum()} rules.")
+    missing = valid_ids - seen
+    if missing:
+        print(
+            f"  WARNING: LLM did not annotate {len(missing)} rule(s): ids {sorted(missing)}. "
+            f"They are retained with null annotation.",
+            file=sys.stderr,
+        )
+
+    print(f"  LLM annotated {df['policy_score'].notna().sum()} / {n} rules.")
     return df
+
+
+def _statistical_order(df: pd.DataFrame) -> pd.DataFrame:
+    """Order rules by objective statistics only: cross-domain first, then lift,
+    then confidence. This is the ONLY ordering used; the LLM never reorders."""
+    sort_cols = [c for c in ["cross_domain", "lift", "confidence"] if c in df.columns]
+    asc = [False] * len(sort_cols)
+    return df.sort_values(sort_cols, ascending=asc).reset_index(drop=True)
 
 
 # ---------------------------------------------------------------------------
 # Human-readable summary writer
 # ---------------------------------------------------------------------------
 
-def write_summary(df: pd.DataFrame, out_path: Path, top_n: int = TOP_N_LLM) -> None:
-    """Write a text summary of the top rules."""
+def write_summary(df: pd.DataFrame, out_path: Path, top_n: int | None = None) -> None:
+    """Write a text summary of rules ordered by statistics.
+
+    Rules are ordered by objective statistics (cross-domain, lift, confidence).
+    If the LLM annotation step ran, each rule additionally shows its policy
+    annotation — but the ORDER and INCLUSION are statistical, never LLM-driven.
+    """
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    llm_selected = "llm_rank" in df.columns and df["llm_rank"].notna().any()
+    annotated = "policy_score" in df.columns and df["policy_score"].notna().any()
 
-    if llm_selected:
-        ranked = (
-            df[df["llm_rank"].notna()]
-            .sort_values("llm_rank")
-            .head(top_n)
-        )
-        header_note = f"  LLM-SELECTED: Top {top_n} Most Novel & Policy-Relevant Rules\n"
-    else:
-        ranked = (
-            df.sort_values(
-                ["cross_domain", "lift", "confidence"],
-                ascending=[False, False, False],
-            ).head(top_n)
-        )
-        header_note = f"  Top {top_n} Rules by Statistical Ranking (cross-domain priority)\n"
+    ranked = _statistical_order(df)
+    if top_n is not None:
+        ranked = ranked.head(top_n)
 
     total_rules = len(df)
-    cross_domain_count = int(df["cross_domain"].sum()) if "cross_domain" in df.columns else "N/A"
+    cross_domain_count = int(df["cross_domain"].sum()) if "cross_domain" in df.columns else 0
     avg_lift = df["lift"].mean() if "lift" in df.columns else None
     avg_conf = df["confidence"].mean() if "confidence" in df.columns else None
 
@@ -351,23 +308,19 @@ def write_summary(df: pd.DataFrame, out_path: Path, top_n: int = TOP_N_LLM) -> N
         f.write("=" * 72 + "\n")
         f.write("  TOP RULES -- CROSS-DOMAIN MOBILITY x EMOTION ANALYSIS\n")
         f.write("  LA WILDFIRES 2025 (Jan 3 – Feb 4, 2025 | 33 days)\n")
-        f.write(header_note)
+        f.write("  Ordered by statistics (cross-domain, lift, confidence).\n")
+        if annotated:
+            f.write("  LLM provides policy annotation only; it does not rank or select.\n")
         f.write("=" * 72 + "\n\n")
 
-        # Pipeline quality summary
         f.write("── RULE PIPELINE QUALITY SUMMARY ───────────────────────────────\n")
-        f.write(f"  Total rules mined   : {total_rules}\n")
-        f.write(f"  Cross-domain rules  : {cross_domain_count}"
+        f.write(f"  Total rules (statistically valid): {total_rules}\n")
+        f.write(f"  Cross-domain rules               : {cross_domain_count}"
                 f" ({100 * cross_domain_count / max(total_rules, 1):.1f}%)\n")
         if avg_lift is not None:
-            f.write(f"  Mean lift           : {avg_lift:.2f}\n")
+            f.write(f"  Mean lift                        : {avg_lift:.2f}\n")
         if avg_conf is not None:
-            f.write(f"  Mean confidence     : {avg_conf:.1f}%\n")
-        if llm_selected:
-            avg_novelty = ranked["novelty_score"].mean()
-            avg_policy = ranked["policy_score"].mean()
-            f.write(f"  LLM avg novelty     : {avg_novelty:.1f}/10\n")
-            f.write(f"  LLM avg policy      : {avg_policy:.1f}/10\n")
+            f.write(f"  Mean confidence                  : {avg_conf:.1f}%\n")
         f.write("─" * 72 + "\n\n")
 
         for i, (_, rule) in enumerate(ranked.iterrows(), start=1):
@@ -379,11 +332,10 @@ def write_summary(df: pd.DataFrame, out_path: Path, top_n: int = TOP_N_LLM) -> N
                 f"  Support: {int(rule['support'])} days ({float(rule['support_pct']):.1f}%)  "
                 f"Confidence: {float(rule['confidence']):.1f}%  Lift: {float(rule['lift']):.2f}\n"
             )
-            if llm_selected and pd.notna(rule.get("llm_rank")):
-                novelty = rule.get("novelty_score")
+            if annotated:
                 policy = rule.get("policy_score")
-                if pd.notna(novelty) and pd.notna(policy):
-                    f.write(f"  LLM: novelty={int(novelty)}/10  policy_relevance={int(policy)}/10\n")
+                if pd.notna(policy):
+                    f.write(f"  Policy relevance (LLM annotation): {int(policy)}/10\n")
                 reasoning = rule.get("llm_reasoning", "")
                 if reasoning and str(reasoning).strip():
                     f.write(f"  Insight: {reasoning}\n")
@@ -402,11 +354,13 @@ def write_summary(df: pd.DataFrame, out_path: Path, top_n: int = TOP_N_LLM) -> N
 def main() -> None:
     _load_env()
 
-    parser = argparse.ArgumentParser(description="Evaluate FCA rules with optional LLM scoring.")
+    parser = argparse.ArgumentParser(
+        description="Annotate FCA rules with optional LLM policy commentary (no selection/ranking)."
+    )
     parser.add_argument(
         "--llm",
         action="store_true",
-        help="Enable LLM batch selection via OpenAI API (requires OPENAI_API_KEY).",
+        help="Enable LLM annotation via OpenAI API (requires OPENAI_API_KEY).",
     )
     parser.add_argument(
         "--model",
@@ -416,8 +370,9 @@ def main() -> None:
     parser.add_argument(
         "--top-n",
         type=int,
-        default=TOP_N_LLM,
-        help=f"Number of top rules to select (default: {TOP_N_LLM}).",
+        default=None,
+        help="Optionally limit the text summary to the top-N rules by statistics "
+             "(default: show all).",
     )
     args = parser.parse_args()
 
@@ -435,14 +390,18 @@ def main() -> None:
     print(f"  Cross-domain rules: {cross_count} / {len(df)}")
 
     if args.llm:
-        print(f"Running LLM batch selection (model={args.model}, top_n={args.top_n}) ...")
-        df = select_top_rules_with_llm(df, model=args.model, top_n=args.top_n)
+        print(f"Running LLM annotation (model={args.model}) on ALL rules ...")
+        df = annotate_all_rules_with_llm(df, model=args.model)
     else:
         print("Skipping LLM step (use --llm to enable).")
 
+    # Always store in statistical order so the CSV itself reflects the
+    # objective ranking, not any LLM influence.
+    df = _statistical_order(df)
+
     OUT_CSV.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(OUT_CSV, index=False)
-    print(f"Evaluated rules saved to {OUT_CSV}")
+    print(f"Evaluated (annotated) rules saved to {OUT_CSV}")
 
     write_summary(df, OUT_TXT, top_n=args.top_n)
 

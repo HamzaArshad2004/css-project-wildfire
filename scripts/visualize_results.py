@@ -509,13 +509,20 @@ class ResultsVisualizer:
         print(f"  ✓ Saved to {output_file}")
 
     def create_summary_report(self):
-        """Generate text summary"""
+        """Generate text summary.
+
+        Rules are ordered by OBJECTIVE STATISTICS only (cross-domain, lift,
+        confidence). If the LLM annotation step ran, each rule additionally shows
+        a policy-relevance annotation and rationale — but the LLM never selects,
+        ranks, or validates rules. Validity comes entirely from the statistical
+        pipeline and the tautology filter upstream.
+        """
         print("📝 Creating summary report...")
 
         output_file = OUTPUT_DIR.parent / 'summary_report.txt'
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
-        # Prefer evaluated CSV (with LLM scores) over raw rules
+        # Prefer evaluated CSV (with LLM annotation) over raw rules
         rules_df = pd.DataFrame()
         for path in (EVALUATED_RULES_FILE, RULES_FILE):
             try:
@@ -524,7 +531,7 @@ class ResultsVisualizer:
             except Exception:
                 continue
 
-        llm_available = "llm_rank" in rules_df.columns and rules_df["llm_rank"].notna().any()
+        annotated = "policy_score" in rules_df.columns and rules_df["policy_score"].notna().any()
 
         with open(output_file, 'w') as f:
             f.write("=" * 80 + "\n")
@@ -547,22 +554,16 @@ class ResultsVisualizer:
                     f.write(f"  {col:45s} {activation_pct:5.1f}%\n")
 
             if len(rules_df) > 0:
-                if llm_available:
-                    top_rules = (
-                        rules_df[rules_df["llm_rank"].notna()]
-                        .sort_values("llm_rank")
-                        .head(20)
-                    )
-                    f.write("\n\nTOP 20 LLM-SELECTED ASSOCIATION RULES:\n")
-                else:
-                    top_rules = (
-                        rules_df.sort_values(
-                            ["cross_domain", "lift", "confidence"] if "cross_domain" in rules_df.columns
-                            else ["lift", "confidence"],
-                            ascending=False,
-                        ).head(10)
-                    )
-                    f.write("\n\nTOP 10 ASSOCIATION RULES:\n")
+                sort_cols = (
+                    ["cross_domain", "lift", "confidence"]
+                    if "cross_domain" in rules_df.columns
+                    else ["lift", "confidence"]
+                )
+                top_rules = rules_df.sort_values(sort_cols, ascending=False)
+                n_rules = len(top_rules)
+                f.write(f"\n\nASSOCIATION RULES (statistically ordered: cross-domain, lift, confidence) — {n_rules} total:\n")
+                if annotated:
+                    f.write("(LLM provides policy annotation only; it does not rank or select rules.)\n")
                 f.write("-" * 80 + "\n")
 
                 for i, (_, row) in enumerate(top_rules.iterrows(), start=1):
@@ -575,17 +576,16 @@ class ResultsVisualizer:
                         f.write(f"  Confidence: {float(row['confidence']):.1f}%\n")
                     if 'lift' in row:
                         f.write(f"  Lift: {float(row['lift']):.2f}\n")
-                    if llm_available and pd.notna(row.get("llm_rank")):
-                        novelty = row.get("novelty_score")
+                    if annotated:
                         policy = row.get("policy_score")
-                        if pd.notna(novelty) and pd.notna(policy):
-                            f.write(f"  LLM: novelty={int(novelty)}/10  policy_relevance={int(policy)}/10\n")
+                        if pd.notna(policy):
+                            f.write(f"  Policy relevance (LLM annotation): {int(policy)}/10\n")
                         reasoning = row.get("llm_reasoning", "")
                         if reasoning and str(reasoning).strip():
-                            f.write(f"  Why it matters: {reasoning}\n")
+                            f.write(f"  Insight: {reasoning}\n")
                         rec = row.get("llm_policy_recommendation", "")
                         if rec and str(rec).strip():
-                            f.write(f"  Policy recommendation: {rec}\n")
+                            f.write(f"  Recommendation: {rec}\n")
 
             f.write("\n" + "=" * 80 + "\n")
 
